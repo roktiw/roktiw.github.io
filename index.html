@@ -1,7 +1,380 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmar.io feed and tame all animals! - Copyright 2024 Wiktor Swiatkowski skleia.com</title>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        canvas {
+            background: #f3d8c7;
+            display: block;
+            margin: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid black;
+        }
+    </style>
+</head>
+
 <body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        canvas.width = viewportWidth;
+        canvas.height = viewportHeight;
+
+        const mapSize = 2048;
+
+        let mouseX = canvas.width / 2;
+        let mouseY = canvas.height / 2;
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: 50,
+            maxSize: 100,
+            speed: 1.3,
+            foodEaten: {},
+            totalFoodEaten: 0,
+            totalFoodPossessed: 0
+        };
+
+        const staticObjects = [
+            { type: 'rock', emoji: '🪨', positions: [], sizeRange: [24, 36, 48] },  // Updated with sizeRange
+            { type: 'tree', emoji: '🌳', positions: [], sizeRange: [140, 180, 200] },  // Updated with sizeRange
+            { type: 'mushroom', emoji: '🍄', positions: [], sizeRange: [30, 45, 60] }
+
+        ];
+
+
+        const foodTypes = {
+            "banana": "🍌",
+            "peanut": "🥜",
+            "strawberry": "🍓",
+            "carrot": "🥕",
+            "lettuce": "🥬",
+            "grass": "🌾"
+        };
+
+        const foodItems = [];
+        const foodProjectiles = []; // Array to store food projectiles
+
+        const animalsData = {
+            "monkey": { "emoji": "🐒", "favoriteFood": ["banana", "peanut"], "sizeRange": [64, 70, 48] },
+            "squirrel": { "emoji": "🐿️", "favoriteFood": ["peanut", "strawberry"], "sizeRange": [64, 70, 48] },
+            "bird": { "emoji": "🐦", "favoriteFood": ["grass", "strawberry"], "sizeRange": [64, 70, 48] },
+            "rabbit": { "emoji": "🐇", "favoriteFood": ["carrot", "strawberry"], "sizeRange": [64, 70, 48] },
+            "turtle": { "emoji": "🐢", "favoriteFood": ["lettuce", "carrot"], "sizeRange": [64, 70, 48] },
+            "goat": { "emoji": "🐐", "favoriteFood": ["lettuce", "grass"], "sizeRange": [64, 36, 48] }
+        };
+
+        const animals = [];
+
+        function generateBackgroundElements() {
+            const squareSize = 500;
+            const squaresX = Math.ceil(mapSize / squareSize);
+            const squaresY = Math.ceil(mapSize / squareSize);
+
+            for (let x = 0; x < squaresX; x++) {
+                for (let y = 0; y < squaresY; y++) {
+                    const elementsCount = Math.floor(Math.random() * 3) + 1;
+                    for (let i = 0; i < elementsCount; i++) {
+                        const objectType = Math.random() > 0.5 ? staticObjects[0] : staticObjects[1];
+                        const randomSize = objectType.sizeRange[Math.floor(Math.random() * objectType.sizeRange.length)];
+                        objectType.positions.push({
+                            x: x * squareSize + Math.random() * squareSize,
+                            y: y * squareSize + Math.random() * squareSize,
+                            size: randomSize  // Use a random size from the range
+                        });
+                    }
+                }
+            }
+        }
+
+
+        function generateFoodItems() {
+            const squareSize = 500;
+            const squaresX = Math.ceil(mapSize / squareSize);
+            const squaresY = Math.ceil(mapSize / squareSize);
+            const minFoodPerType = 20;
+            const maxFoodPerType = 30;
+
+            Object.keys(foodTypes).forEach(type => {
+                const amount = Math.floor(Math.random() * (maxFoodPerType - minFoodPerType + 1) + minFoodPerType);
+                for (let i = 0; i < amount; i++) {
+                    const xSquare = Math.floor(Math.random() * squaresX);
+                    const ySquare = Math.floor(Math.random() * squaresY);
+                    foodItems.push({
+                        type: type,
+                        x: xSquare * squareSize + Math.random() * squareSize,
+                        y: ySquare * squareSize + Math.random() * squareSize
+                    });
+                }
+            });
+        }
+
+        function generateAnimals() {
+            const squareSize = 500;
+            const squaresX = Math.ceil(mapSize / squareSize);
+            const squaresY = Math.ceil(mapSize / squareSize);
+            const minAnimalsPerType = 1;
+            const maxAnimalsPerType = 5;
+
+            Object.keys(animalsData).forEach(type => {
+                const amount = Math.floor(Math.random() * (maxAnimalsPerType - minAnimalsPerType + 1) + minAnimalsPerType);
+                for (let i = 0; i < amount; i++) {
+                    const xSquare = Math.floor(Math.random() * squaresX);
+                    const ySquare = Math.floor(Math.random() * squaresY);
+                    const size = animalsData[type].sizeRange[Math.floor(Math.random() * animalsData[type].sizeRange.length)];
+                    animals.push({
+                        type: type,
+                        emoji: animalsData[type].emoji,
+                        x: xSquare * squareSize + Math.random() * squareSize,
+                        y: ySquare * squareSize + Math.random() * squareSize,
+                        size: size,
+                        currentSize: size,
+                        maxSize: 100,
+                        totalFoodEaten: 0,
+                        timesFed: 0, // New property
+                        tameStatus: false // New property
+                    });
+                }
+            });
+        }
+
+        function drawEntities() {
+            staticObjects.forEach(obj => {
+                obj.positions.forEach(pos => {
+                    ctx.font = `${pos.size}px Arial`;  // Use the specific size from the position
+                    ctx.fillText(obj.emoji, pos.x - player.x + canvas.width / 2, pos.y - player.y + canvas.height / 2);
+                });
+            });
+
+            // Assume the font size for food is smaller and constant
+            ctx.font = '34px Arial';
+            foodItems.forEach(item => {
+                const emoji = foodTypes[item.type];
+                ctx.fillText(emoji, item.x - player.x + canvas.width / 2, item.y - player.y + canvas.height / 2);
+            });
+
+            animals.forEach(animal => {
+                ctx.font = `${animal.size}px Arial`;
+                ctx.fillText(animal.emoji, animal.x - player.x + canvas.width / 2, animal.y - player.y + canvas.height / 2);
+            });
+        }
+
+
+        function drawPlayer() {
+            ctx.font = '64px Arial';
+            ctx.fillText('😀', canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
+        }
+
+        function collect(eater) {
+            for (let i = foodItems.length - 1; i >= 0; i--) {
+                let food = foodItems[i];
+                // Calculate distance between eater and food item
+                let dx = eater.x - food.x;
+                let dy = eater.y - food.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+
+                // Define a "collectable" distance
+                let collectDistance = eater.size;  // Or any other metric you prefer
+
+                if (distance <= collectDistance) {
+                    eater.totalFoodEaten++;
+                    eater.totalFoodPossessed++;
+                    foodItems.splice(i, 1); // Remove food item from the array
+                }
+            }
+        }
+
+        function shootFood() {
+            const foodTypeKeys = Object.keys(foodTypes);
+            const randomIndex = Math.floor(Math.random() * foodTypeKeys.length);
+            const randomFoodType = foodTypeKeys[randomIndex];
+
+            const foodProjectile = {
+                x: player.x,
+                y: player.y,
+                speed: 10,
+                direction: Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2),
+                foodType: randomFoodType
+            };
+            foodProjectiles.push(foodProjectile);
+        }
+
+        function updateFoodProjectiles() {
+            for (let i = foodProjectiles.length - 1; i >= 0; i--) {
+                const projectile = foodProjectiles[i];
+                projectile.x += Math.cos(projectile.direction) * projectile.speed;
+                projectile.y += Math.sin(projectile.direction) * projectile.speed;
+
+                // Check for collision with animals
+                animals.forEach(animal => {
+                    if (Math.hypot(projectile.x - animal.x, projectile.y - animal.y) < animal.size) {
+                        if (animalsData[animal.type].favoriteFood.includes(projectile.foodType)) {
+                            animal.timesFed++;
+                            if (animal.timesFed >= 2 && !animal.tameStatus) { // Check if taming threshold is reached and animal is not already tamed
+                                animal.tameStatus = true;
+                                animal.followingPlayer = true; // Assuming the animal starts following the player upon being tamed
+                                console.log(`Animal tamed: ${animal.type} now following player.`);
+                            }
+                            foodProjectiles.splice(i, 1); // Remove the projectile
+                        }
+                    }
+                });
+
+                if (projectile.x < 0 || projectile.x > mapSize || projectile.y < 0 || projectile.y > mapSize) {
+                    foodProjectiles.splice(i, 1);
+                }
+            }
+        }
+
+
+
+        function drawFoodProjectiles() {
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'red';
+            foodProjectiles.forEach(projectile => {
+                const emoji = foodTypes[projectile.foodType];
+                ctx.fillText(emoji, projectile.x - player.x + canvas.width / 2, projectile.y - player.y + canvas.height / 2);
+            });
+        }
+
+        function updatePositions() {
+            let angle = Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2);
+            let dx = Math.cos(angle) * player.speed;
+            let dy = Math.sin(angle) * player.speed;
+
+            staticObjects.forEach(obj => {
+                obj.positions.forEach(pos => {
+                    pos.x = (pos.x - dx + mapSize) % mapSize;
+                    pos.y = (pos.y - dy + mapSize) % mapSize;
+                });
+            });
+
+            foodItems.forEach(item => {
+                item.x = (item.x - dx + mapSize) % mapSize;
+                item.y = (item.y - dy + mapSize) % mapSize;
+            });
+
+            animals.forEach(animal => {
+                if (animal.followingPlayer) {
+                    let animalAngle = Math.atan2(player.y - animal.y, player.x - animal.x);
+                    animal.x += Math.cos(animalAngle) * animal.speed;
+                    animal.y += Math.sin(animalAngle) * animal.speed;
+                } else {
+                    animal.x = (animal.x - dx + mapSize) % mapSize;
+                    animal.y = (animal.y - dy + mapSize) % mapSize;
+                }
+            });
+
+            player.x = (player.x + dx + mapSize) % mapSize;
+            player.y = (player.y + dy + mapSize) % mapSize;
+
+            collect(player); // Player collects food
+            animals.forEach(animal => collect(animal)); // Each animal collects food
+        }
+
+        function getAnimalStats() {
+            const stats = {};
+            // Initialize stats for each animal type
+            Object.keys(animalsData).forEach(type => {
+                stats[type] = { total: 0, tamed: 0 };
+            });
+
+            // Collect data for total and tamed animals
+            animals.forEach(animal => {
+                stats[animal.type].total++;
+                if (animal.tameStatus) {
+                    stats[animal.type].tamed++;
+                }
+            });
+
+            return stats;
+        }
+
+        function drawHUD() {
+            const stats = getAnimalStats(); // Get the updated stats for all animals
+            const hudX = 10; // Position of HUD from left
+            const hudY = 10; // Position of HUD from top
+            let offsetY = 0;
+            const lineHeight = 20; // Line height for each animal type
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; // Semi-transparent white background
+            ctx.fillRect(hudX, hudY, 300, Object.keys(stats).length * lineHeight + 60);
+
+            ctx.fillStyle = 'black'; // Text color
+            ctx.font = '16px Arial';
+            ctx.fillText(`Food Collected: ${player.totalFoodEaten}`, hudX + 10, hudY + 20);
+            ctx.fillText(`Food Possessed: ${player.totalFoodPossessed}`, hudX + 10, hudY + 40);
+
+            // Display each animal type with total and tamed numbers
+            Object.keys(stats).forEach(type => {
+                const info = stats[type];
+                ctx.fillText(`${animalsData[type].emoji} Total: ${info.total}, Tamed: ${info.tamed}`, hudX + 10, hudY + 60 + offsetY);
+                offsetY += lineHeight;
+            });
+        }
+
+        function checkAllAnimalsTamed() {
+            return animals.every(animal => animal.tameStatus === true);
+        }
+
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updatePositions();
+
+            updateFoodProjectiles(); // Update food projectiles
+            drawFoodProjectiles(); // Draw food projectiles
+
+            drawEntities();
+            drawPlayer();
+            drawHUD(); // Draw the HUD
+            if (checkAllAnimalsTamed()) {
+                drawCongratulations();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawCongratulations() {
+            ctx.font = '56px Arial';
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'center';
+            ctx.fillText('CONGLATURATIONS!!1 you have tamed all the animals ❤️', canvas.width / 2, canvas.height / 2);
+        }
+
+
+        canvas.addEventListener('mousemove', function (event) {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+        });
+
+        canvas.addEventListener('click', function (event) {
+            shootFood(); // Shoot food when the mouse is clicked
+        });
+
+        generateBackgroundElements();
+        generateFoodItems();
+        generateAnimals();
+        gameLoop();
+    </script>
 </body>
+
 </html>
