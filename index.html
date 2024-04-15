@@ -42,6 +42,58 @@
 
         let mouseX = canvas.width / 2;
         let mouseY = canvas.height / 2;
+        let isInputActive = false; // Track if the input (touch or mouse) is actively moving the player
+
+        function updateInput(event) {
+            event.preventDefault();
+            if (event.type === 'mousemove' || event.type === 'mousedown') {
+                inputX = event.clientX;
+                inputY = event.clientY;
+            } else if (event.touches) {
+                inputX = event.touches[0].clientX;
+                inputY = event.touches[0].clientY;
+            }
+            isInputActive = true;
+        }
+
+        function stopInput() {
+            isInputActive = false;
+        }
+
+        canvas.addEventListener('mousemove', updateInput);
+        canvas.addEventListener('mousedown', updateInput);
+        canvas.addEventListener('mouseup', stopInput);
+        canvas.addEventListener('mouseleave', stopInput);
+
+        canvas.addEventListener('touchmove', updateInput, { passive: false });
+        canvas.addEventListener('touchstart', updateInput, { passive: false });
+        canvas.addEventListener('touchend', stopInput);
+        canvas.addEventListener('touchcancel', stopInput);
+
+
+        function handleInput(event) {
+            let clientX, clientY;
+            if (event.touches) {
+                event.preventDefault();
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            inputX = clientX;
+            inputY = clientY;
+        }
+
+        function handleAction() {
+            shootFood();
+        }
+
+        // Add event listeners for both touch and mouse
+        canvas.addEventListener('mousemove', handleInput);
+        canvas.addEventListener('touchmove', handleInput, { passive: false });
+        canvas.addEventListener('mousedown', handleAction);
+        canvas.addEventListener('touchstart', handleAction, { passive: false });
 
         const player = {
             x: canvas.width / 2,
@@ -203,6 +255,7 @@
             }
         }
 
+        // Function for shooting food adapted to use generic input variables
         function shootFood() {
             const foodTypeKeys = Object.keys(foodTypes);
             const randomIndex = Math.floor(Math.random() * foodTypeKeys.length);
@@ -212,7 +265,7 @@
                 x: player.x,
                 y: player.y,
                 speed: 10,
-                direction: Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2),
+                direction: Math.atan2(inputY - canvas.height / 2, inputX - canvas.width / 2),
                 foodType: randomFoodType
             };
             foodProjectiles.push(foodProjectile);
@@ -317,17 +370,16 @@
             const lineHeight = 20; // Line height for each animal type
 
             ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; // Semi-transparent white background
-            ctx.fillRect(hudX, hudY, 300, Object.keys(stats).length * lineHeight + 60);
+            ctx.fillRect(hudX, hudY, 100, Object.keys(stats).length * lineHeight + 60);
 
             ctx.fillStyle = 'black'; // Text color
             ctx.font = '16px Arial';
-            ctx.fillText(`Food Collected: ${player.totalFoodEaten}`, hudX + 10, hudY + 20);
-            ctx.fillText(`Food Possessed: ${player.totalFoodPossessed}`, hudX + 10, hudY + 40);
+            ctx.fillText(`Points: ${player.totalFoodEaten}`, hudX + 10, hudY + 20); ctx.fillText(`Food: ${player.totalFoodPossessed}`, hudX + 10, hudY + 40);
 
             // Display each animal type with total and tamed numbers
             Object.keys(stats).forEach(type => {
                 const info = stats[type];
-                ctx.fillText(`${animalsData[type].emoji} Total: ${info.total}, Tamed: ${info.tamed}`, hudX + 10, hudY + 60 + offsetY);
+                ctx.fillText(`${animalsData[type].emoji} ${info.tamed} of ${info.total}`, hudX + 10, hudY + 60 + offsetY);
                 offsetY += lineHeight;
             });
         }
@@ -357,7 +409,7 @@
             ctx.font = '56px Arial';
             ctx.fillStyle = 'red';
             ctx.textAlign = 'center';
-            ctx.fillText('CONGLATURATIONS!!1 you have tamed all the animals ❤️', canvas.width / 2, canvas.height / 2);
+            ctx.fillText('CONGLATURATIONS!!1', canvas.width / 2, canvas.height / 2);
         }
 
 
