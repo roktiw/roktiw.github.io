@@ -42,58 +42,6 @@
 
         let mouseX = canvas.width / 2;
         let mouseY = canvas.height / 2;
-        let isInputActive = false; // Track if the input (touch or mouse) is actively moving the player
-
-        function updateInput(event) {
-            event.preventDefault();
-            if (event.type === 'mousemove' || event.type === 'mousedown') {
-                inputX = event.clientX;
-                inputY = event.clientY;
-            } else if (event.touches) {
-                inputX = event.touches[0].clientX;
-                inputY = event.touches[0].clientY;
-            }
-            isInputActive = true;
-        }
-
-        function stopInput() {
-            isInputActive = false;
-        }
-
-        canvas.addEventListener('mousemove', updateInput);
-        canvas.addEventListener('mousedown', updateInput);
-        canvas.addEventListener('mouseup', stopInput);
-        canvas.addEventListener('mouseleave', stopInput);
-
-        canvas.addEventListener('touchmove', updateInput, { passive: false });
-        canvas.addEventListener('touchstart', updateInput, { passive: false });
-        canvas.addEventListener('touchend', stopInput);
-        canvas.addEventListener('touchcancel', stopInput);
-
-
-        function handleInput(event) {
-            let clientX, clientY;
-            if (event.touches) {
-                event.preventDefault();
-                clientX = event.touches[0].clientX;
-                clientY = event.touches[0].clientY;
-            } else {
-                clientX = event.clientX;
-                clientY = event.clientY;
-            }
-            inputX = clientX;
-            inputY = clientY;
-        }
-
-        function handleAction() {
-            shootFood();
-        }
-
-        // Add event listeners for both touch and mouse
-        canvas.addEventListener('mousemove', handleInput);
-        canvas.addEventListener('touchmove', handleInput, { passive: false });
-        canvas.addEventListener('mousedown', handleAction);
-        canvas.addEventListener('touchstart', handleAction, { passive: false });
 
         const player = {
             x: canvas.width / 2,
@@ -109,7 +57,7 @@
         const staticObjects = [
             { type: 'rock', emoji: '🪨', positions: [], sizeRange: [24, 36, 48] },  // Updated with sizeRange
             { type: 'tree', emoji: '🌳', positions: [], sizeRange: [140, 180, 200] },  // Updated with sizeRange
-            { type: 'mushroom', emoji: '🍄', positions: [], sizeRange: [30, 45, 60] }
+            { type: 'bush', emoji: '🌲', positions: [], sizeRange: [30, 45, 60] }
 
         ];
 
@@ -146,7 +94,7 @@
                 for (let y = 0; y < squaresY; y++) {
                     const elementsCount = Math.floor(Math.random() * 3) + 1;
                     for (let i = 0; i < elementsCount; i++) {
-                        const objectType = Math.random() > 0.5 ? staticObjects[0] : staticObjects[1];
+                        const objectType = staticObjects[Math.floor(Math.random() * 2)];
                         const randomSize = objectType.sizeRange[Math.floor(Math.random() * objectType.sizeRange.length)];
                         objectType.positions.push({
                             x: x * squareSize + Math.random() * squareSize,
@@ -255,7 +203,6 @@
             }
         }
 
-        // Function for shooting food adapted to use generic input variables
         function shootFood() {
             const foodTypeKeys = Object.keys(foodTypes);
             const randomIndex = Math.floor(Math.random() * foodTypeKeys.length);
@@ -265,7 +212,7 @@
                 x: player.x,
                 y: player.y,
                 speed: 10,
-                direction: Math.atan2(inputY - canvas.height / 2, inputX - canvas.width / 2),
+                direction: Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2),
                 foodType: randomFoodType
             };
             foodProjectiles.push(foodProjectile);
