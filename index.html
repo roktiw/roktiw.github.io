@@ -175,8 +175,19 @@
         }
 
         function drawPlayer() {
+            ctx.font = `${player.size}px Arial`; // Use the dynamic size for the player
             ctx.fillText('😀', canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
         }
+
+
+        function updatePlayerSize() {
+            // Calculate new size based on the total food possessed
+            player.size = 24 + player.totalFoodPossessed; // Starting size is 24, adjust as necessary
+            if (player.size > player.maxSize) {
+                player.size = player.maxSize; // Ensure player size does not exceed maxSize
+            }
+        }
+
 
         function collect(eater) {
             for (let i = foodItems.length - 1; i >= 0; i--) {
@@ -195,19 +206,25 @@
         }
 
         function shootFood() {
-            const foodTypeKeys = Object.keys(foodTypes);
-            const randomIndex = Math.floor(Math.random() * foodTypeKeys.length);
-            const randomFoodType = foodTypeKeys[randomIndex];
+            if (player.totalFoodPossessed > 0) { // Ensure the player has food to shoot
+                const foodTypeKeys = Object.keys(foodTypes);
+                const randomIndex = Math.floor(Math.random() * foodTypeKeys.length);
+                const randomFoodType = foodTypeKeys[randomIndex];
 
-            const foodProjectile = {
-                x: player.x,
-                y: player.y,
-                speed: 10,
-                direction: Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2),
-                foodType: randomFoodType
-            };
-            foodProjectiles.push(foodProjectile);
+                const foodProjectile = {
+                    x: player.x,
+                    y: player.y,
+                    speed: 10,
+                    direction: Math.atan2(mouseY - canvas.height / 2, mouseX - canvas.width / 2),
+                    foodType: randomFoodType
+                };
+                foodProjectiles.push(foodProjectile);
+                player.totalFoodPossessed--; // Decrease food count when shooting
+            } else {
+                console.log("No food to shoot!");
+            }
         }
+
 
         function updateFoodProjectiles() {
             for (let i = foodProjectiles.length - 1; i >= 0; i--) {
@@ -327,6 +344,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             updatePositions();
 
+            updatePlayerSize(); // Update the player size based on food possessed
             updateFoodProjectiles();
             drawFoodProjectiles();
 
