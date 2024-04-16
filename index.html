@@ -115,12 +115,15 @@
             <img src="farmario.webp" alt="Welcome Image" class="welcome-image">
             <div class="welcome-text">
                 <b>Welcome to Farmar.io!</b>
-                <p> Howdy! 🧑‍🌾 In this game, your goal is to feed and tame all the animals. 🎮 Move your player using your mouse or
-                    touch and collect food items to grow.👆 Click or tap anywhere to shoot food towards animals. Tame them by
+                <p> Howdy! 🧑‍🌾 In this game, your goal is to feed and tame all the animals. 🎮 Move your player using
+                    your mouse or
+                    touch and collect food items to grow.👆 Click or tap anywhere to shoot food towards animals. Tame
+                    them by
                     feeding them their favorite food!</p>
                 <p>💡Tap anywhere on the screen to begin. Good luck! 🤞</p>
                 <div class="copyright">
-                    <p>© Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com" target="_blank">skleia.com</a></p>
+                    <p>© Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com"
+                            target="_blank">skleia.com</a></p>
                 </div>
             </div>
         </div>
@@ -327,6 +330,14 @@
             }
         }
 
+        // testing screen testing START
+        //   function checkFoodCollectionAndTriggerEndScreen() {
+        //        if (player.totalFoodEaten >= 7) {
+        //             drawSummaryScreen();
+        //            window.cancelAnimationFrame(requestId); // Stop the game loop
+        //         }
+        //}
+        // testing screen testing END
 
         function collect(eater) {
             const squareSize = 500;
@@ -341,25 +352,16 @@
                     eater.totalFoodEaten++;
                     eater.totalFoodPossessed++;
 
-                    // Check if the eater is an animal and increase size
-                    if (eater.hasOwnProperty('type') && animalsData.hasOwnProperty(eater.type)) {
-                        eater.size += 3;  // Increase animal size by 3 pixels
-                        eater.size = Math.min(eater.size, eater.maxSize);  // Ensure size does not exceed maxSize
-                    }
-
-                    // Update food count per square if the eater is a player
-                    if (eater === player) {
-                        let xSquare = Math.floor(food.x / squareSize);
-                        let ySquare = Math.floor(food.y / squareSize);
-                        if (window.foodCountPerSquare[xSquare][ySquare] > 0) {
-                            window.foodCountPerSquare[xSquare][ySquare]--;
-                        }
-                    }
-
+                    // Additional check to trigger end screen if eater is the player
+                    //     if (eater === player) {
+                    //         checkFoodCollectionAndTriggerEndScreen();
+                    //     }
+                    // rest of the existing code...
                     foodItems.splice(i, 1); // Remove the food item
                 }
             }
         }
+
 
 
 
@@ -516,8 +518,9 @@
             drawEntities();
             drawPlayer();
             drawHUD();
-            if (checkAllAnimalsTamed()) {
-                drawCongratulations();
+            if (checkAllAnimalsTamed() && !window.gameEndTime) {
+                window.gameEndTime = Date.now(); // Record the end time
+                drawSummaryScreen(); // Call the new function to draw summary information
             }
             requestAnimationFrame(gameLoop);
         }
@@ -565,6 +568,52 @@
         generateFoodItems();
         generateAnimals();
         gameLoop();
+
+        canvas.addEventListener('click', function (event) {
+            let x = event.clientX - canvas.getBoundingClientRect().left;
+            let y = event.clientY - canvas.getBoundingClientRect().top;
+
+            // Check if the click is within the restart button boundaries
+            if (window.restartButton && x >= window.restartButton.x && x <= window.restartButton.x + window.restartButton.width && y >= window.restartButton.y && y <= window.restartButton.y + window.restartButton.height) {
+                restartGame();
+            } else if (!isTouchDevice) {
+                shootFood(); // Existing functionality for shooting food
+            }
+        });
+
+
+        function drawSummaryScreen() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            ctx.fillStyle = 'black';
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('🥳', canvas.width / 2, canvas.height / 2 - 190);
+            ctx.fillText('CONGLATURATIONS !!!', canvas.width / 2, canvas.height / 2 - 160);
+            ctx.fillText('You have themed all animals!🎉', canvas.width / 2, canvas.height / 2 - 130);
+            ctx.fillText('That was supercool and exciting! 😀', canvas.width / 2, canvas.height / 2 - 100);
+            ctx.fillText('Lets catch again all those farm animals! 🤠', canvas.width / 2, canvas.height / 2 - 70);
+
+
+
+            // Draw restart button
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(canvas.width / 2 - 50, canvas.height / 2, 100, 40); // x, y, width, height
+            ctx.fillStyle = 'white';
+            ctx.fillText('PLAY', canvas.width / 2, canvas.height / 2 + 28);
+            window.restartButton = { x: canvas.width / 2 - 50, y: canvas.height / 2, width: 300, height: 50 };
+        }
+
+        canvas.addEventListener('click', function (event) {
+            let x = event.clientX - canvas.getBoundingClientRect().left;
+            let y = event.clientY - canvas.getBoundingClientRect().top;
+
+            // Check if the click is within the restart button boundaries
+            if (window.restartButton && x >= window.restartButton.x && x <= window.restartButton.x + window.restartButton.width && y >= window.restartButton.y && y <= window.restartButton.y + window.restartButton.height) {
+                window.location.reload(); // Reload the page
+            }
+        });
+
+
     </script>
 </body>
 
