@@ -46,7 +46,7 @@
         const player = {
             x: canvas.width / 2,
             y: canvas.height / 2,
-            size: 50,
+            size: 24,
             maxSize: 100,
             speed: 1.3,
             foodEaten: {},
@@ -162,7 +162,7 @@
                 });
             });
 
-            ctx.font = '34px Arial';
+            ctx.font = '34px Arial'; //food size
             foodItems.forEach(item => {
                 const emoji = foodTypes[item.type];
                 ctx.fillText(emoji, item.x - player.x + canvas.width / 2, item.y - player.y + canvas.height / 2);
@@ -175,7 +175,6 @@
         }
 
         function drawPlayer() {
-            ctx.font = '64px Arial';
             ctx.fillText('😀', canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
         }
 
@@ -296,27 +295,29 @@
             return stats;
         }
 
+
         function drawHUD() {
-            const stats = getAnimalStats();
-            const hudX = 10;
-            const hudY = 10;
+            const stats = getAnimalStats(); // Get the updated stats for all animals
+            const hudX = 10; // Position of HUD from left
+            const hudY = 10; // Position of HUD from top
             let offsetY = 0;
-            const lineHeight = 20;
+            const lineHeight = 20; // Line height for each animal type
 
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-            ctx.fillRect(hudX, hudY, 300, Object.keys(stats).length * lineHeight + 60);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)'; // Semi-transparent white background
+            ctx.fillRect(hudX, hudY, 100, Object.keys(stats).length * lineHeight + 60);
 
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = 'black'; // Text color
             ctx.font = '16px Arial';
-            ctx.fillText(`Food Collected: ${player.totalFoodEaten}`, hudX + 10, hudY + 20);
-            ctx.fillText(`Food Possessed: ${player.totalFoodPossessed}`, hudX + 10, hudY + 40);
+            ctx.fillText(`Points: ${player.totalFoodEaten}`, hudX + 10, hudY + 20); ctx.fillText(`Food: ${player.totalFoodPossessed}`, hudX + 10, hudY + 40);
 
+            // Display each animal type with total and tamed numbers
             Object.keys(stats).forEach(type => {
                 const info = stats[type];
-                ctx.fillText(`${animalsData[type].emoji} Total: ${info.total}, Tamed: ${info.tamed}`, hudX + 10, hudY + 60 + offsetY);
+                ctx.fillText(`${animalsData[type].emoji} ${info.tamed} of ${info.total}`, hudX + 10, hudY + 60 + offsetY);
                 offsetY += lineHeight;
             });
         }
+
 
         function checkAllAnimalsTamed() {
             return animals.every(animal => animal.tameStatus === true);
