@@ -51,7 +51,8 @@
             speed: 1.3,
             foodEaten: {},
             totalFoodEaten: 0,
-            totalFoodPossessed: 0
+            totalFoodPossessed: 0,
+            icon: '😀' // Default player icon
         };
 
         const staticObjects = [
@@ -194,10 +195,23 @@
             });
         }
 
+        // In the function that draws the player
         function drawPlayer() {
             ctx.font = `${player.size}px Arial`; // Use the dynamic size for the player
-            ctx.fillText('😀', canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
+            ctx.fillText(player.icon, canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
         }
+        function changePlayerIcon() {
+            const icons = ["🫢", "😀", "😃", "😄", "😁", "😆", "🥹", "😅"];
+            const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+
+            player.icon = randomIcon; // Assuming 'player.icon' is used to draw the player's emoji on the canvas
+
+            // Set a timeout to revert the icon back after 3 seconds
+            setTimeout(() => {
+                player.icon = '😀'; // Revert to default icon
+            }, 3000);
+        }
+
 
 
         function updatePlayerSize() {
@@ -222,19 +236,26 @@
                     eater.totalFoodEaten++;
                     eater.totalFoodPossessed++;
 
-                    // Determine which square the food item is in
-                    let xSquare = Math.floor(food.x / squareSize);
-                    let ySquare = Math.floor(food.y / squareSize);
+                    // Check if the eater is an animal and increase size
+                    if (eater.hasOwnProperty('type') && animalsData.hasOwnProperty(eater.type)) {
+                        eater.size += 3;  // Increase animal size by 3 pixels
+                        eater.size = Math.min(eater.size, eater.maxSize);  // Ensure size does not exceed maxSize
+                    }
 
-                    // Decrement the food count for that square
-                    if (window.foodCountPerSquare && window.foodCountPerSquare[xSquare] && window.foodCountPerSquare[xSquare][ySquare]) {
-                        window.foodCountPerSquare[xSquare][ySquare]--;
+                    // Update food count per square if the eater is a player
+                    if (eater === player) {
+                        let xSquare = Math.floor(food.x / squareSize);
+                        let ySquare = Math.floor(food.y / squareSize);
+                        if (window.foodCountPerSquare[xSquare][ySquare] > 0) {
+                            window.foodCountPerSquare[xSquare][ySquare]--;
+                        }
                     }
 
                     foodItems.splice(i, 1); // Remove the food item
                 }
             }
         }
+
 
 
         function shootFood() {
@@ -268,9 +289,13 @@
                     if (Math.hypot(projectile.x - animal.x, projectile.y - animal.y) < animal.size) {
                         if (animalsData[animal.type].favoriteFood.includes(projectile.foodType)) {
                             animal.timesFed++;
+                            animal.size += 3; // Grow the animal when fed
+                            animal.size = Math.min(animal.size, animal.maxSize); // Ensure size does not exceed maxSize
+
                             if (animal.timesFed >= 2 && !animal.tameStatus) {
                                 animal.tameStatus = true;
                                 animal.followingPlayer = true;
+                                changePlayerIcon(); // Call to change the player's icon
                                 console.log(`Animal tamed: ${animal.type} now following player.`);
                             }
                             foodProjectiles.splice(i, 1);
@@ -283,6 +308,7 @@
                 }
             }
         }
+
 
         function drawFoodProjectiles() {
             ctx.font = '24px Arial';
