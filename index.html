@@ -14,44 +14,67 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        background-color: rgba(0, 0, 0, 0.5);
+        /* Semi-transparent background */
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 9999;
     }
 
-    .welcome-content {
+    .welcome-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
         background-color: white;
-        opacity: .9;
-        max-width: 80%;
-        max-height: 80%;
-        padding: 20px;
-        text-align: center;
+        opacity: 0.9;
+        width: 90%;
+        max-width: 800px;
         border-radius: 10px;
-        
+        padding: 20px;
+        box-sizing: border-box;
+        height: 90vh;
+        /* Responsive height */
     }
 
     .welcome-image {
-        width: 50%;
-        max-width: 200px; /* Limit maximum width for smaller screens */
-        margin-bottom: 20px;
+        width: 100%;
+        max-width: 200px;
+        margin: 0 20px 10px 0;
         border-radius: 50%;
+        flex: 1;
     }
 
-    .animal-list {
-        margin-top: 20px;
-        text-align: center;
+    .welcome-text {
+        flex: 2;
+        text-align: left;
+        /* Text aligned to the left */
     }
 
-    .animal-list p {
-        margin: 5px 0;
+    /* Responsive styles for smaller screens */
+    @media screen and (max-width: 600px) {
+        .welcome-container {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            /* Center text for smaller screens */
+        }
+
+        .welcome-image {
+            margin: 0 0 20px;
+            /* Adjust margin for vertical layout */
+        }
+
+        .welcome-text {
+            order: 2;
+            /* Make sure text comes after the image */
+        }
     }
 
     /* Copyright styles */
     .copyright {
-        margin-top: 20px;
-        font-size: 12px;
+        font-size: 16px;
         color: #666;
     }
 
@@ -59,12 +82,6 @@
         color: #666;
         text-decoration: none;
     }
-
-    /* Responsive styles */
-    @media screen and (max-width: 500px) {
-        .welcome-image {
-            width: 30%;
-        }    }
 </style>
 
 <head>
@@ -93,23 +110,25 @@
 </head>
 
 <body>
-    <div class="welcome-screen" id="welcomeScreen"> <!-- Added id="welcomeScreen" -->
-        <div class="welcome-content">
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-container">
             <img src="farmario.webp" alt="Welcome Image" class="welcome-image">
-            <h1>Welcome to Farmar.io!</h1>
-            <p>🫏 In this game, your goal is to feed and tame all the animals. Move your player using your mouse or
-                touch and collect food items to grow. Click or tap anywhere to shoot food towards animals. Tame them by
-                feeding them their favorite food!</p>
-            <p>👉 Tap anywhere on the screen to begin. Good luck! 💪</p>
-            <div class="copyright">
-                <p>Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com" target="_blank">skleia.com</a></p>
+            <div class="welcome-text">
+                <b>Welcome to Farmar.io!</b>
+                <p> Howdy! 🧑‍🌾 In this game, your goal is to feed and tame all the animals. 🎮 Move your player using your mouse or
+                    touch and collect food items to grow.👆 Click or tap anywhere to shoot food towards animals. Tame them by
+                    feeding them their favorite food!</p>
+                <p>💡Tap anywhere on the screen to begin. Good luck! 🤞</p>
+                <div class="copyright">
+                    <p>© Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com" target="_blank">skleia.com</a></p>
+                </div>
             </div>
         </div>
     </div>
     <script>
-        // Add an event listener to close the welcome screen when tapped anywhere
         document.getElementById('welcomeScreen').addEventListener('click', function () {
             this.style.display = 'none'; // Hide the welcome screen
+            window.gameStartTime = Date.now();
         });
     </script>
     <!-- Canvas for the game -->
@@ -302,7 +321,7 @@
 
         function updatePlayerSize() {
             // Calculate new size based on the total food possessed
-            player.size = 24 + player.totalFoodPossessed; // Starting size is 24, adjust as necessary
+            player.size = 24 + player.totalFoodPossessed * 2.3; // Starting size is 24, adjust as necessary
             if (player.size > player.maxSize) {
                 player.size = player.maxSize; // Ensure player size does not exceed maxSize
             }
@@ -546,12 +565,6 @@
         generateFoodItems();
         generateAnimals();
         gameLoop();
-
-        // Add an event listener to close the welcome screen when tapped anywhere
-        document.getElementById('welcomeScreen').addEventListener('click', function () {
-            this.style.display = 'none'; // Hide the welcome screen
-        });
-
     </script>
 </body>
 
