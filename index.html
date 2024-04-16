@@ -1,5 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+    /* General styles */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Welcome screen styles */
+    .welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .welcome-content {
+        background-color: white;
+        opacity: .9;
+        max-width: 80%;
+        max-height: 80%;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        
+    }
+
+    .welcome-image {
+        width: 50%;
+        max-width: 200px; /* Limit maximum width for smaller screens */
+        margin-bottom: 20px;
+        border-radius: 50%;
+    }
+
+    .animal-list {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .animal-list p {
+        margin: 5px 0;
+    }
+
+    /* Copyright styles */
+    .copyright {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #666;
+    }
+
+    .copyright a {
+        color: #666;
+        text-decoration: none;
+    }
+
+    /* Responsive styles */
+    @media screen and (max-width: 500px) {
+        .welcome-image {
+            width: 30%;
+        }    }
+</style>
 
 <head>
     <meta charset="UTF-8">
@@ -27,6 +93,32 @@
 </head>
 
 <body>
+    <div class="welcome-screen" id="welcomeScreen"> <!-- Added id="welcomeScreen" -->
+        <div class="welcome-content">
+            <img src="farmario.webp" alt="Welcome Image" class="welcome-image">
+            <h1>Welcome to Farmar.io!</h1>
+            <p>🫏 In this game, your goal is to feed and tame all the animals. Move your player using your mouse or
+                touch and collect food items to grow. Click or tap anywhere to shoot food towards animals. Tame them by
+                feeding them their favorite food!</p>
+            <p>👉 Tap anywhere on the screen to begin. Good luck! 💪</p>
+            <div class="animal-list">
+                <p><strong>Animals and their favorite foods:</strong></p>
+                <p>🐒 : 🍌, 🥜  | 🐇 : 🥕, 🍓 </p>
+                <p>🐿️ : 🥜, 🍓  | 🐢 : 🥬, 🥕</p>
+                <p>🐦 : 🌾, 🍓  | 🐐 : 🥬, 🌾</p>
+            </div>
+            <div class="copyright">
+                <p>Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com" target="_blank">skleia.com</a></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Add an event listener to close the welcome screen when tapped anywhere
+        document.getElementById('welcomeScreen').addEventListener('click', function () {
+            this.style.display = 'none'; // Hide the welcome screen
+        });
+    </script>
+    <!-- Canvas for the game -->
     <canvas id="gameCanvas"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -74,12 +166,12 @@
         const foodProjectiles = [];
 
         const animalsData = {
-            "monkey": { "emoji": "🐒", "favoriteFood": ["banana", "peanut"], "sizeRange": [64, 70, 48] },
-            "squirrel": { "emoji": "🐿️", "favoriteFood": ["peanut", "strawberry"], "sizeRange": [64, 70, 48] },
-            "bird": { "emoji": "🐦", "favoriteFood": ["grass", "strawberry"], "sizeRange": [64, 70, 48] },
-            "rabbit": { "emoji": "🐇", "favoriteFood": ["carrot", "strawberry"], "sizeRange": [64, 70, 48] },
-            "turtle": { "emoji": "🐢", "favoriteFood": ["lettuce", "carrot"], "sizeRange": [64, 70, 48] },
-            "goat": { "emoji": "🐐", "favoriteFood": ["lettuce", "grass"], "sizeRange": [64, 36, 48] }
+            "monkey": { "emoji": "🐒", "favoriteFood": ["banana", "peanut"], "sizeRange": [24, 36, 48] },
+            "squirrel": { "emoji": "🐿️", "favoriteFood": ["peanut", "strawberry"], "sizeRange": [24, 36, 48] },
+            "bird": { "emoji": "🐦", "favoriteFood": ["grass", "strawberry"], "sizeRange": [24, 36, 48] },
+            "rabbit": { "emoji": "🐇", "favoriteFood": ["carrot", "strawberry"], "sizeRange": [24, 36, 48] },
+            "turtle": { "emoji": "🐢", "favoriteFood": ["lettuce", "carrot"], "sizeRange": [24, 36, 48] },
+            "goat": { "emoji": "🐐", "favoriteFood": ["lettuce", "grass"], "sizeRange": [24, 36, 48] }
         };
 
         const animals = [];
@@ -201,7 +293,7 @@
             ctx.fillText(player.icon, canvas.width / 2 - player.size / 4, canvas.height / 2 + player.size / 4);
         }
         function changePlayerIcon() {
-            const icons = ["🫢", "😀", "😃", "😄", "😁", "😆", "🥹", "😅", "🤪", "😜", "😝", "🤡", "🤣", "😂", "😹", "🙃", "😇", "😎", "😏", "🤓", "🥳", "😕", "🤯", "🤑", "😊", "🙂", "😋", "😛", "😶", "😐", "😶‍🌫️", "😑"];
+            const icons = ["🤠", "🫢", "😀", "😃", "😄", "😁", "😆", "🥹", "😅", "🤪", "😜", "😝", "🤣", "😂", "🙃", "😇", "😎", "😏", "🤓", "🥳", "😕", "😊", "🙂", "😋", "😛", "😶", "😐", "😑"];
             const randomIcon = icons[Math.floor(Math.random() * icons.length)];
 
             player.icon = randomIcon; // Assuming 'player.icon' is used to draw the player's emoji on the canvas
@@ -460,6 +552,12 @@
         generateFoodItems();
         generateAnimals();
         gameLoop();
+
+        // Add an event listener to close the welcome screen when tapped anywhere
+        document.getElementById('welcomeScreen').addEventListener('click', function () {
+            this.style.display = 'none'; // Hide the welcome screen
+        });
+
     </script>
 </body>
 
