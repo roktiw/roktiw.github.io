@@ -126,7 +126,8 @@
             <img src="farmario.webp" alt="Welcome Image" class="welcome-image">
             <div class="welcome-text">
                 <b>Welcome to Farmar.io!</b>
-                <p> Howdy! 🧑‍🌾 Your goal is to feed and tame all the animals. 🎮 Move player icon using mouse or touch to collect food 🎯 Click or tap anywhere to shoot food towards animals.</p>
+                <p> Howdy! 🧑‍🌾 Your goal is to feed and tame all the animals. 🎮 Move player icon using mouse or touch
+                    to collect food 🎯 Click or tap anywhere to shoot food towards animals.</p>
                 <p>💡Tap anywhere to start. Good luck! 🤞</p>
                 <div class="copyright">
                     <p>© Copyright 2024 Wiktor Świątkowski <a href="http://www.skleia.com"
@@ -225,41 +226,45 @@
             const squareSize = 500;
             const squaresX = Math.ceil(mapSize / squareSize);
             const squaresY = Math.ceil(mapSize / squareSize);
-            const minFoodPerType = 1; // Minimum food items per type per cycle
-            const maxFoodPerType = 3; // Maximum food items per type per cycle
-            const maxFoodTotalPerSquare = 10; // Max food items per square
 
-            // Initialize or reset an array to keep track of food counts per square if it doesn't exist
             if (!window.foodCountPerSquare) {
                 window.foodCountPerSquare = Array.from({ length: squaresX }, () => Array(squaresY).fill(0));
+                console.log("Food count per square initialized.");
             }
 
-            // Shuffle food types to ensure diversity in generation
-            const foodTypeKeys = Object.keys(foodTypes);
-            const shuffledFoodTypes = foodTypeKeys.sort(() => 0.5 - Math.random());
+            console.log("Current food distribution:", window.foodCountPerSquare);
 
-            shuffledFoodTypes.forEach(type => {
+            const foodTypes = ["banana", "peanut", "strawberry"]; // Ensure these are valid types
+            foodTypes.forEach(type => {
                 for (let xSquare = 0; xSquare < squaresX; xSquare++) {
                     for (let ySquare = 0; ySquare < squaresY; ySquare++) {
-                        if (window.foodCountPerSquare[xSquare][ySquare] < maxFoodTotalPerSquare) {
-                            const availableSpace = maxFoodTotalPerSquare - window.foodCountPerSquare[xSquare][ySquare];
-                            const amountToGenerate = Math.min(availableSpace, Math.floor(Math.random() * (maxFoodPerType - minFoodPerType + 1) + minFoodPerType));
-                            for (let i = 0; i < amountToGenerate; i++) {
-                                foodItems.push({
+                        const currentCount = window.foodCountPerSquare[xSquare][ySquare];
+                        console.log(`Checking square (${xSquare}, ${ySquare}) with current count: ${currentCount}`);
+
+                        if (currentCount < 10) { // Assuming max 10 items per square
+                            const itemsToAdd = Math.floor(Math.random() * (3 - 1 + 1) + 1); // generate between 1 and 3 items
+                            console.log(`Adding ${itemsToAdd} items to square (${xSquare}, ${ySquare})`);
+                            for (let i = 0; i < itemsToAdd; i++) {
+                                const newItem = {
                                     type: type,
                                     x: xSquare * squareSize + Math.random() * squareSize,
                                     y: ySquare * squareSize + Math.random() * squareSize
-                                });
+                                };
+                                foodItems.push(newItem);
                                 window.foodCountPerSquare[xSquare][ySquare]++;
                             }
                         }
                     }
                 }
             });
+
+            console.log("Updated food distribution:", window.foodCountPerSquare);
         }
 
+
+
         // Schedule food generation every 5 seconds
-        setInterval(generateFoodItems, 7000);
+        setInterval(generateFoodItems, 3000);
 
         function generateAnimals() {
             const squareSize = 500;
@@ -358,16 +363,14 @@
                 if (distance <= collectDistance) {
                     eater.totalFoodEaten++;
                     eater.totalFoodPossessed++;
-
-                    // Additional check to trigger end screen if eater is the player
-                    //     if (eater === player) {
-                    //         checkFoodCollectionAndTriggerEndScreen();
-                    //     }
-                    // rest of the existing code...
+                    let xSquare = Math.floor(food.x / squareSize);
+                    let ySquare = Math.floor(food.y / squareSize);
+                    window.foodCountPerSquare[xSquare][ySquare]--;  // Decrement the count for the square
                     foodItems.splice(i, 1); // Remove the food item
                 }
             }
         }
+
 
 
 
@@ -529,6 +532,7 @@
                 window.gameEndTime = Date.now(); // Record the end time
                 drawSummaryScreen(); // Call the new function to draw summary information
             }
+
             requestAnimationFrame(gameLoop);
         }
 
