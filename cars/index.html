@@ -39,6 +39,10 @@
         let lives = 3;  // Player starts with 3 lives
         let showExplosion = false;
         let explosionStartTime = 0;
+        let spawnInterval = 2000; // Initial spawn interval in milliseconds
+        let carSpeed = 5; // Initial speed of incoming cars
+        let spawnTimer; // Timer for spawning cars
+        let carScaleFactor = 1.02;
 
 
         const incomingCars = [];
@@ -93,7 +97,6 @@
             }
         }
 
-
         function updatePlayerPosition(event, inputType) {
             const rect = canvas.getBoundingClientRect();
             let xPos = inputType === 'mouse' ? event.clientX - rect.left : event.touches[0].clientX - rect.left;
@@ -105,10 +108,23 @@
         canvas.addEventListener('touchmove', (event) => updatePlayerPosition(event, 'touch'), { passive: false });
 
         function spawnIncomingCar() {
+            for (let i = 0; i < 1 + Math.floor(score / 10); i++) { // Spawn more cars every 10 points
+                if (i > 1) {
+                    // Add a random delay after spawning each additional car
+                    const randomDelay = Math.random() * 750 + 250; // Random delay between 200 and 600 milliseconds
+                    setTimeout(createCar, randomDelay);
+                } else {
+                    createCar();
+                }
+            }
+        }
+
+
+
+        function createCar() {
             const carTypes = ['🚘', '🚖', '🚍', '🚔'];
             const carType = carTypes[Math.floor(Math.random() * carTypes.length)];
             const initialSize = 24;
-
             let laneOffset;
             if (Math.random() < 0.3) {
                 // 30% chance to target the player's current x position
@@ -117,13 +133,13 @@
                 const maxLaneOffset = canvas.width * 0.25; // Maximum offset from the center
                 laneOffset = (Math.random() - 0.5) * maxLaneOffset * 2;
             }
-
             incomingCars.push({
-                x: horizonCenter.x, // Spawn at the horizon center x-coordinate
+                x: horizonCenter.x,
                 y: horizonCenter.y,
                 size: initialSize,
                 type: carType,
-                laneOffset: laneOffset
+                laneOffset: laneOffset,
+                speed: carSpeed // Use the current speed for new cars
             });
         }
 
@@ -131,20 +147,23 @@
             incomingCars.forEach(car => {
                 ctx.font = `${car.size}px serif`;
                 ctx.fillText(car.type, car.x + car.laneOffset, car.y);
-                car.y += 5; // Move down
-                car.size *= 1.02; // Scale up the size to simulate coming closer
+                car.y += car.speed; // Move the car down
 
-                // Check for the car moving past the player without collision
+                // Increase the size of the car to simulate coming closer
+                car.size *= carScaleFactor;
+
                 if (car.y > playerCar.y && !car.scored && !car.collided) {
-                    score += 1; // Increment score when the car avoids collision
-                    car.scored = true; // Mark the car as scored
-                }
-
-                // Handle collision
-                if (checkCollision(playerCar, car) && !car.collided) {
-                    lives -= 1;
-                    car.collided = true; // Mark the car as collided
-                    startExplosion(); // Start the explosion effect
+                    if (checkCollision(playerCar, car)) {
+                        if (!car.collided) {
+                            lives -= 1;
+                            car.collided = true; // Ensure life is subtracted only once per collision
+                            startExplosion(); // Start the explosion effect
+                        }
+                    } else {
+                        score += 1; // Increment score when the car avoids collision
+                        car.scored = true; // Mark the car as scored
+                        updateGameDifficulty(); // Adjust game difficulty based on new score
+                    }
                 }
 
                 // Remove car from array if it has moved off the canvas
@@ -156,26 +175,12 @@
         }
 
 
+
         function checkCollision(player, incoming) {
-            // Calculate the bounds of the incoming car
             let incomingX = incoming.x + incoming.laneOffset - incoming.size / 2;
             let incomingWidth = incoming.size;
-            let incomingHeight = incoming.size; // Assuming height is proportional to size for simplicity
-
-            // Calculate the bounds of the player car
-            let playerX = player.x;
-            let playerWidth = player.width;
-            let playerHeight = player.height;
-
-            // Check if the bounding boxes overlap
-            return (
-                incomingX < playerX + playerWidth &&
-                incomingX + incomingWidth > playerX &&
-                incoming.y < player.y + playerHeight &&
-                incoming.y + incomingHeight > player.y
-            );
+            return incomingX < player.x + player.width && incomingX + incomingWidth > player.x;
         }
-
 
         function startExplosion() {
             showExplosion = true;
@@ -188,6 +193,15 @@
             ctx.textAlign = 'right';
             ctx.fillText(`Score: ${score}`, canvas.width - 20, 30);
             ctx.fillText(`Lives: ${lives}`, canvas.width - 20, 60);
+        }
+
+        function updateGameDifficulty() {
+            if (score % 10 === 0 && score !== 0) { // Check if score is a multiple of 10
+                spawnInterval *= 0.9; // Decrease the spawn interval to spawn cars faster
+                carSpeed *= 1.1; // Increase the speed of incoming cars
+                clearInterval(spawnTimer); // Reset the spawn timer with new interval
+                spawnTimer = setInterval(spawnIncomingCar, spawnInterval);
+            }
         }
 
         function gameLoop() {
@@ -206,14 +220,13 @@
             ctx.font = '196px Arial';
             ctx.fillStyle = 'red';
             ctx.textAlign = 'center';
-            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);  // Draw "GAME OVER" in the middle of the screen
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2); // Draw "GAME OVER" in the middle of the screen
 
             // Display the final score below "GAME OVER"
             ctx.font = '48px Arial'; // Smaller font size for the score
             ctx.fillStyle = 'white'; // Use a contrasting color for better visibility
             ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 60); // Position the score slightly below the "GAME OVER" text
         }
-
 
         function resetGame() {
             lives = 3;
@@ -225,7 +238,7 @@
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-        setInterval(spawnIncomingCar, 2000);
+        spawnTimer = setInterval(spawnIncomingCar, spawnInterval);
         requestAnimationFrame(gameLoop);
     </script>
 </body>
