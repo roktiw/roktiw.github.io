@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pseudo-3D Race Game</title>
+    <style>
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Prevent scrollbars */
+        }
+
+        canvas {
+            display: block;
+            /* Removes the margin inside the body */
+            width: 100%;
+            height: 100%;
+            background: #333;
+            /* Lighter background to see if canvas loads */
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let horizonCenter = { x: canvas.width / 2, y: canvas.height * 0.15 };
+        let playerCar = { x: canvas.width / 2, y: canvas.height * 0.85, width: 50, height: 100 };
+        let score = 0;  // Initialize score
+        let lives = 3;  // Player starts with 3 lives
+        let showExplosion = false;
+        let explosionStartTime = 0;
+
+
+        const incomingCars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            updateGameLayout(); // Recalculate game elements based on new dimensions
+        }
+
+        function updateGameLayout() {
+            // Update positions or other related size-dependent properties
+            horizonCenter = { x: canvas.width / 2, y: canvas.height * 0.15 };
+            playerCar = { x: canvas.width / 2, y: canvas.height * 0.85, width: 50, height: 100 };
+            setupCanvas();
+        }
+
+        function setupCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.15);
+            drawRoad();
+            drawPlayerCar();
+        }
+
+        function drawRoad() {
+            ctx.fillStyle = 'green';
+            ctx.fillRect(0, canvas.height * 0.15, canvas.width, canvas.height * 0.85);
+            ctx.fillStyle = 'grey';
+            ctx.beginPath();
+            ctx.moveTo(horizonCenter.x, canvas.height * 0.15);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawPlayerCar() {
+            if (showExplosion) {
+                if (Date.now() - explosionStartTime < 2000) { // Check if 2 seconds have passed
+                    // Blink the explosion by checking the current time modulo some value for a quick on/off effect
+                    if (Math.floor(Date.now() / 300) % 2 === 0) {
+                        ctx.font = "196px serif";
+                        ctx.fillText('💥', playerCar.x - playerCar.width / 2, playerCar.y); // Ensure the explosion is centered
+                    }
+                } else {
+                    showExplosion = false; // Stop showing the explosion after 2 seconds
+                }
+            } else {
+                ctx.font = "196px serif";
+                ctx.fillText('🚗', playerCar.x - playerCar.width / 2, playerCar.y); // Draw player car normally if not exploding
+            }
+        }
+
+
+        function updatePlayerPosition(event, inputType) {
+            const rect = canvas.getBoundingClientRect();
+            let xPos = inputType === 'mouse' ? event.clientX - rect.left : event.touches[0].clientX - rect.left;
+            xPos = Math.max(playerCar.width / 2, Math.min(canvas.width - playerCar.width / 2, xPos));
+            playerCar.x = xPos - playerCar.width / 2;
+        }
+
+        canvas.addEventListener('mousemove', (event) => updatePlayerPosition(event, 'mouse'));
+        canvas.addEventListener('touchmove', (event) => updatePlayerPosition(event, 'touch'), { passive: false });
+
+        function spawnIncomingCar() {
+            const carTypes = ['🚘', '🚖', '🚍', '🚔'];
+            const carType = carTypes[Math.floor(Math.random() * carTypes.length)];
+            const initialSize = 24;
+
+            let laneOffset;
+            if (Math.random() < 0.3) {
+                // 30% chance to target the player's current x position
+                laneOffset = playerCar.x + playerCar.width / 2 - horizonCenter.x;
+            } else {
+                const maxLaneOffset = canvas.width * 0.25; // Maximum offset from the center
+                laneOffset = (Math.random() - 0.5) * maxLaneOffset * 2;
+            }
+
+            incomingCars.push({
+                x: horizonCenter.x, // Spawn at the horizon center x-coordinate
+                y: horizonCenter.y,
+                size: initialSize,
+                type: carType,
+                laneOffset: laneOffset
+            });
+        }
+
+        function drawIncomingCars() {
+            incomingCars.forEach(car => {
+                ctx.font = `${car.size}px serif`;
+                ctx.fillText(car.type, car.x + car.laneOffset, car.y);
+                car.y += 5; // Move down
+                car.size *= 1.02; // Scale up the size to simulate coming closer
+
+                // Check for the car moving past the player without collision
+                if (car.y > playerCar.y && !car.scored && !car.collided) {
+                    score += 1; // Increment score when the car avoids collision
+                    car.scored = true; // Mark the car as scored
+                }
+
+                // Handle collision
+                if (checkCollision(playerCar, car) && !car.collided) {
+                    lives -= 1;
+                    car.collided = true; // Mark the car as collided
+                    startExplosion(); // Start the explosion effect
+                }
+
+                // Remove car from array if it has moved off the canvas
+                if (car.y > canvas.height) {
+                    const index = incomingCars.indexOf(car);
+                    incomingCars.splice(index, 1);
+                }
+            });
+        }
+
+
+        function checkCollision(player, incoming) {
+            // Calculate the bounds of the incoming car
+            let incomingX = incoming.x + incoming.laneOffset - incoming.size / 2;
+            let incomingWidth = incoming.size;
+            let incomingHeight = incoming.size; // Assuming height is proportional to size for simplicity
+
+            // Calculate the bounds of the player car
+            let playerX = player.x;
+            let playerWidth = player.width;
+            let playerHeight = player.height;
+
+            // Check if the bounding boxes overlap
+            return (
+                incomingX < playerX + playerWidth &&
+                incomingX + incomingWidth > playerX &&
+                incoming.y < player.y + playerHeight &&
+                incoming.y + incomingHeight > player.y
+            );
+        }
+
+
+        function startExplosion() {
+            showExplosion = true;
+            explosionStartTime = Date.now();
+        }
+
+        function drawScore() {
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Score: ${score}`, canvas.width - 20, 30);
+            ctx.fillText(`Lives: ${lives}`, canvas.width - 20, 60);
+        }
+
+        function gameLoop() {
+            if (lives > 0) {
+                setupCanvas();
+                drawIncomingCars();
+                drawScore();
+                requestAnimationFrame(gameLoop);
+            } else {
+                drawGameOver();
+            }
+        }
+
+        function drawGameOver() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '196px Arial';
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'center';
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2);  // Draw "GAME OVER" in the middle of the screen
+
+            // Display the final score below "GAME OVER"
+            ctx.font = '48px Arial'; // Smaller font size for the score
+            ctx.fillStyle = 'white'; // Use a contrasting color for better visibility
+            ctx.fillText(`Score: ${score}`, canvas.width / 2, canvas.height / 2 + 60); // Position the score slightly below the "GAME OVER" text
+        }
+
+
+        function resetGame() {
+            lives = 3;
+            score = 0;
+            incomingCars = [];
+            showExplosion = false;
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        setInterval(spawnIncomingCar, 2000);
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+
+</html>
