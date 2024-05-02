@@ -163,11 +163,11 @@
         }
 
         function drawHUD() {
-            const hudX = canvas.width - 20; // Set a margin from the right edge
+            const hudX = 20; // Set a margin from the left edge
 
             // Draw Lives (Hearts)
             ctx.font = "30px Arial";
-            ctx.textAlign = 'right';
+            ctx.textAlign = 'left';
             ctx.fillText("❤️".repeat(lives), hudX, 40);
 
             // Draw Score
@@ -211,6 +211,10 @@
             });
         }
 
+        setInterval(function () {
+            score += 1;
+        }, 1000);
+
         function updatePoops() {
             for (let i = poops.length - 1; i >= 0; i--) {
                 poops[i].x += poops[i].speed;
@@ -229,6 +233,7 @@
                         poops[i].y < cacti[j].y + cacti[j].size) {
                         cacti.splice(j, 1); // Remove cactus on collision
                         poops.splice(i, 1); // Remove poop after hitting cactus
+                        score += 25; // Add points for shooting cacti
                         break;
                     }
                 }
