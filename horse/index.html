@@ -129,7 +129,29 @@
             horse.jumping = true;
         }
 
-        document.addEventListener('mousedown', jump);
+        canvas.addEventListener('mousedown', function (event) {
+            const rect = canvas.getBoundingClientRect(); // Get canvas position and size
+            const x = event.clientX - rect.left; // Get x coordinate relative to the canvas
+
+            if (x < canvas.width / 2) {
+                shootPoop(); // Left side of the canvas
+            } else {
+                jump(); // Right side of the canvas
+            }
+        });
+
+        canvas.addEventListener('touchstart', function (event) {
+            const rect = canvas.getBoundingClientRect();
+            const touchX = event.touches[0].clientX - rect.left; // Get touch x coordinate relative to the canvas
+
+            event.preventDefault(); // Prevent scrolling and other touch defaults
+
+            if (touchX < canvas.width / 2) {
+                shootPoop(); // Left side of the canvas
+            } else {
+                jump(); // Right side of the canvas
+            }
+        }, { passive: false }); // Set passive to false to enable preventDefault
 
         function initPlatforms() {
             let x = 0;
@@ -306,8 +328,6 @@
                 horse.midairJumpUsed = true;
             }
         }
-
-        document.addEventListener('mousedown', jump);
 
     </script>
 </body>
