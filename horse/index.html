@@ -78,7 +78,7 @@
         }
 
         function createCarrot(x, y) {
-            let size = 25; // Fixed size for carrots
+            let size = 40; // Fixed size for carrots
             carrots.push({ x, y, size });
         }
 
@@ -187,7 +187,7 @@
                 poops.push({
                     x: horse.x + horse.width / 2,
                     y: horse.y + horse.height / 2,
-                    size: 20,
+                    size: 33,
                     vx: 7,  // Horizontal speed
                     vy: -5, // Initial vertical speed for a slight bounce effect
                 });
@@ -267,6 +267,17 @@
         }
 
 
+        // Periodically generate cacti or carrots on the ground
+        setInterval(function () {
+            if (Math.random() > 0.5) {
+                // Create a cactus at the right edge of the canvas on the ground
+                createCactus(canvas.width, groundPlatform.y - 50);
+            } else {
+                // Create a carrot at the right edge of the canvas on the ground
+                createCarrot(canvas.width, groundPlatform.y - 30);
+            }
+        }, Math.random() * 2000 + 3000); // Random time between 3000ms (3 seconds) and 5000ms (5 seconds)
+
 
 
         function updateGame(time) {
@@ -336,8 +347,15 @@
                 }
             });
 
+            function gameOver() {
+                const gameOverMessage = `Game Over! Your score: ${score}\nPlay again?`;
+                if (window.confirm(gameOverMessage)) {
+                    window.location.reload(); // Reloads the page to restart the game
+                }
+            }
+
             if (lives <= 0) {
-                alert('Game Over!');
+                gameOver();
                 return;
             }
 
