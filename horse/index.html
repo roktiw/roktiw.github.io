@@ -184,15 +184,14 @@
         // Function to shoot poop
         function shootPoop() {
             if (carrotsCollected > 0) {
-                // Adjust the x position to be slightly behind the horse (mimicking a rear-shot).
-                // The y position is set to the middle of the horse's height.
                 poops.push({
-                    x: horse.x + horse.width - 10,  // Start slightly behind the horse's rear
-                    y: horse.y + horse.height / 2, // Middle of the horse height
-                    size: 20, // Poop emoji size
-                    speed: 10  // Speed of the poop emoji
+                    x: horse.x + horse.width / 2,
+                    y: horse.y + horse.height / 2,
+                    size: 20,
+                    vx: 7,  // Horizontal speed
+                    vy: -5, // Initial vertical speed for a slight bounce effect
                 });
-                carrotsCollected -= 1; // Each shot costs one carrot
+                carrotsCollected -= 1; // Decrement carrots
             }
         }
 
@@ -215,22 +214,39 @@
             score += 1;
         }, 1000);
 
+        // Update the Poop Movement and Bouncing Logic
         function updatePoops() {
-            for (let i = poops.length - 1; i >= 0; i--) {
-                poops[i].x += poops[i].speed;
+            const gravity = 0.5; // Gravity effect
+            const bounceFactor = -0.7; // How much velocity is retained after bouncing, negative for reversing direction
 
-                // Remove poop if it goes off the canvas
-                if (poops[i].x > canvas.width) {
+            for (let i = poops.length - 1; i >= 0; i--) {
+                let poop = poops[i];
+
+                // Update horizontal position
+                poop.x += poop.vx;
+
+                // Update vertical position and velocity with gravity
+                poop.vy += gravity;
+                poop.y += poop.vy;
+
+                // Remove poop if it goes off the canvas horizontally
+                if (poop.x > canvas.width) {
                     poops.splice(i, 1);
                     continue;
                 }
 
+                // Bounce off the ground
+                if (poop.y + poop.size > canvas.height) {
+                    poop.y = canvas.height - poop.size; // Correct position to sit on the ground
+                    poop.vy *= bounceFactor; // Reverse and reduce vertical speed
+                }
+
                 // Check collision with cacti
                 for (let j = cacti.length - 1; j >= 0; j--) {
-                    if (poops[i].x + poops[i].size > cacti[j].x &&
-                        poops[i].x < cacti[j].x + cacti[j].size &&
-                        poops[i].y + poops[i].size > cacti[j].y &&
-                        poops[i].y < cacti[j].y + cacti[j].size) {
+                    if (poop.x + poop.size > cacti[j].x &&
+                        poop.x < cacti[j].x + cacti[j].size &&
+                        poop.y + poop.size > cacti[j].y &&
+                        poop.y < cacti[j].y + cacti[j].size) {
                         cacti.splice(j, 1); // Remove cactus on collision
                         poops.splice(i, 1); // Remove poop after hitting cactus
                         score += 25; // Add points for shooting cacti
@@ -239,6 +255,7 @@
                 }
             }
         }
+
 
         function updateGame(time) {
             const deltaTime = (time - lastTime) / 1000;
