@@ -1,192 +1,221 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Horse Runner</title>
-<style>
-  body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
-  canvas { background: #f0f0f0; display: block; }
-</style>
-<script type="text/javascript" nonce="2479fed9afcb4901ae12347bbb2" src="//local.adguard.org?ts=1714611040824&amp;type=content-script&amp;dmn=mail-attachment.googleusercontent.com&amp;url=https%3A%2F%2Fmail-attachment.googleusercontent.com%2Fattachment%2Fu%2F0%2F%3Fui%3D2%26ik%3D16e3b3106a%26attid%3D0.4%26permmsgid%3Dmsg-f%3A1797897979240516629%26th%3D18f36aafbb060c15%26view%3Datt%26disp%3Dsafe%26saddbat%3DANGjdJ8EmPJCOHX2NU-EHF6mceQs0-IOzfaLh-RFkcdIL4_OI3P_IL5cEWZszm49We8JsEFALLkcFZ0agaMXMBf_mRmuHVOr6qSiua2w_FDc_HR0IGKmjVrU6fW_ng3SljufC0KRtDbfsini6U3F97oz5wMI-CvMgM_puebNA-0qsoqLHA6jsZm1rTqJS-sFgYbyAo4GFE7ZCOVgGdsYzdmJPGZGZ8HcanpeVAJlUygl_TAonDlb-ZMZya-OuYScp4GWGr00SQXJicZZwzcjtnGwvlf_nscZ48u-irQG5_soLMRilLfhN1KZOkommMyiqdMOHWIVviHDnpNz0bVwWyQ2qkwJlwUIsmt9vcGDc_jg7hHW_gYNk6TJGKYBKTmwExojiWC8L5OqYYfvDCeUoL-iQ0SNgGmwCwF5IhObm_FxHGOa2TAHpiwXz2Zm_9f5BQn03nXsvx9uwxXa-5Ap7Vd42hU8Uk5qkSa-6aCR_6s5w3jMou5OnRt_pEC3zzKjzwuky8T5_KQZLji7v-mwoQkH_0d3SUaB6w2Nu0KEBAT_RLAVRvILtVfd3MneQAhNcG787KkITWIbU-fBxeUCU801ANnWsp6iErU4alDIwIcKsclRaMFq2aoHAvKHIx2_XsC05518TVgs9D4_H7a_DgSAECZSTOTWIiFU4g2eGl5Q6ZEDCzE_2Y-7yy5UXlHYcclhy8kCs2Q-Mso7NmabCXehiakm-DfHI-2rJYnZk1gPGzt3AFuJcxWlpmK_VWO_mIy7cRn-EdUnH4FBxcTu7i4wWky04Z2iUAjqF21u5sRYkGuQMowAjf_LDoeVDay2YcjeALGrKYzySDbETIv25TY1gN3tbzzzw5IRbWvAj6bY0yebkl6Mcw0r48WKjIkmeKb9VpvANw56qgdy1VSVSFj6BayeLBYP_RxLSIaS1DgBg-bAlbKsMJnQAu6wRhhypBaZAj6TkGjbJNuUDf173om-cRzYivneF-2La2XJ3desbdVbTwv-IaKAkxKig5c&amp;app=chrome.exe&amp;css=3&amp;js=1&amp;rel=0&amp;rji=0&amp;sbe=0&amp;stealth=0"></script>
-<script type="text/javascript" nonce="2479fed9afcb4901ae12347bbb2" src="//local.adguard.org?ts=1714611040824&amp;name=AdGuard%20Extra&amp;name=AdGuard%20Popup%20Blocker&amp;type=user-script"></script></head>
+    <meta charset="UTF-8">
+    <title>Horse Runner</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            background: #f0f0f0;
+            display: block;
+        }
+    </style>
+</head>
 <body>
-<canvas id="gameCanvas"></canvas>
-<script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-let horse = {
-  x: 250,
-  y: 0,
-  width: 100,
-  height: 100,
-  jumping: true,
-  velocityY: 1
-};
+        let horse = {
+            x: 250,
+            y: 0,
+            width: 100,
+            height: 100,
+            jumping: true,
+            velocityY: 1
+        };
 
-let lives = 3;
-let score = 0;
-let platforms = [];
-let platformWidth = 100;
-let platformHeight = 20;
-let scrollSpeed = 3;
-const jumpHeight = 18;
-let lastTime = 0;
+        let lives = 3;
+        let score = 0;
+        let carrotsCollected = 0;
+        let platforms = [];
+        let carrots = [];
+        let platformWidth = 100;
+        let platformHeight = 20;
+        let scrollSpeed = 3;
+        const jumpHeight = 18;
+        let lastTime = 0;
 
-let groundPlatform = {
-  x: 0,
-  y: canvas.height - 50,
-  width: canvas.width,
-  height: 50,
-  color: 'green'
-};
+        let groundPlatform = {
+            x: 0,
+            y: canvas.height - 50,
+            width: canvas.width,
+            height: 50,
+            color: 'green'
+        };
 
-let cacti = [];
+        let cacti = [];
 
-function createPlatform(x, y) {
-  let p = {
-    x: x,
-    y: y ? y : Math.random() * (canvas.height - 200 - groundPlatform.height) + 100,
-    width: Math.random() * 120 + 60,
-    height: platformHeight
-  };
-  platforms.push(p);
+        function createPlatform(x, y) {
+            let p = {
+                x: x,
+                y: y || Math.random() * (canvas.height - 200 - groundPlatform.height) + 100,
+                width: Math.random() * 120 + 60,
+                height: platformHeight
+            };
+            platforms.push(p);
+            if (Math.random() > 0.7) {
+                createCactus(p.x + Math.random() * (p.width - 50), p.y - 50);
+            }
+            if (Math.random() > 0.5) {
+                createCarrot(p.x + p.width / 2, p.y - 30); // Carrots are placed in the middle of platforms
+            }
+        }
 
-  if (Math.random() > 0.7) {
-    createCactus(p.x + Math.random() * (p.width - 50), p.y - 50);
-  }
-}
+        function createCactus(x, y) {
+            let size = Math.random() * (50 - 30) + 30;
+            cacti.push({ x, y, size });
+        }
 
-function createCactus(x, y) {
-  let size = Math.random() * (50 - 30) + 30;
-  cacti.push({ x, y, size });
-}
+        function createCarrot(x, y) {
+            let size = 25; // Fixed size for carrots
+            carrots.push({ x, y, size });
+        }
 
-function initPlatforms() {
-  let x = 0;
-  while (x < canvas.width + 300) {
-    createPlatform(x);
-    x += Math.random() * 300 + 150;
-  }
-  createCactus(groundPlatform.x + 200, groundPlatform.y - 50);
-}
+        function drawHorse() {
+            ctx.font = "100px Arial";
+            ctx.textBaseline = 'bottom';
+            ctx.fillText("🐎", horse.x, horse.y + horse.height);
+        }
 
-function drawHorse() {
-  ctx.font = "100px Arial";
-  ctx.textBaseline = 'bottom';
-  ctx.fillText("🐎", horse.x, horse.y + horse.height);
-}
+        function drawPlatforms() {
+            platforms.forEach(p => {
+                ctx.fillStyle = '#8b4513';
+                ctx.fillRect(p.x, p.y, p.width, p.height);
+            });
+            ctx.fillStyle = groundPlatform.color;
+            ctx.fillRect(groundPlatform.x, groundPlatform.y, groundPlatform.width, groundPlatform.height);
+        }
 
-function drawPlatforms() {
-  platforms.forEach(p => {
-    ctx.fillStyle = '#8b4513';
-    ctx.fillRect(p.x, p.y, p.width, p.height);
-  });
-  ctx.fillStyle = groundPlatform.color;
-  ctx.fillRect(groundPlatform.x, groundPlatform.y, canvas.width, groundPlatform.height);
-}
+        function drawCacti() {
+            cacti.forEach(c => {
+                ctx.font = `${c.size}px Arial`;
+                ctx.fillText("🌵", c.x, c.y + c.size);
+            });
+        }
 
-function drawCacti() {
-  cacti.forEach(c => {
-    ctx.font = `${c.size}px Arial`;
-    ctx.fillText("🌵", c.x, c.y + c.size);
-  });
-}
+        function drawCarrots() {
+            carrots.forEach(carrot => {
+                ctx.font = `${carrot.size}px Arial`;
+                ctx.fillText("🥕", carrot.x, carrot.y + carrot.size);
+            });
+        }
 
-function drawLives() {
-  ctx.font = "30px Arial";
-  ctx.textAlign = 'right';
-  ctx.fillText("❤️".repeat(lives), canvas.width - 30, 40);
-}
+        function drawLives() {
+            ctx.font = "30px Arial";
+            ctx.textAlign = 'right';
+            ctx.fillText("❤️".repeat(lives), canvas.width - 30, 40);
+        }
 
-function drawScore() {
-  ctx.font = "30px Arial";
-  ctx.textAlign = 'left';
-  ctx.fillText(`Score: ${score}`, 30, 40);
-}
+        function drawScore() {
+            ctx.font = "30px Arial";
+            ctx.textAlign = 'left';
+            ctx.fillText(`Score: ${score}`, 30, 40);
+        }
 
-function jump() {
-  if (horse.jumping) return;
-  horse.velocityY = -jumpHeight;
-  horse.jumping = true;
-}
+        function jump() {
+            if (horse.jumping) return;
+            horse.velocityY = -jumpHeight;
+            horse.jumping = true;
+        }
 
-document.addEventListener('mousedown', jump);
+        document.addEventListener('mousedown', jump);
 
-function updateGame(time) {
-  const deltaTime = (time - lastTime) / 1000;
-  lastTime = time;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function initPlatforms() {
+            let x = 0;
+            while (x < canvas.width + 300) {
+                createPlatform(x);
+                x += Math.random() * 300 + 150;
+            }
+            createCactus(groundPlatform.x + 200, groundPlatform.y - 50);
+        }
 
-  platforms.forEach(p => { p.x -= scrollSpeed; });
-  cacti.forEach(c => { c.x -= scrollSpeed; });
+        function updateGame(time) {
+    const deltaTime = (time - lastTime) / 1000;
+    lastTime = time;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (platforms[platforms.length - 1].x < canvas.width) {
-    createPlatform(canvas.width + Math.random() * 200);
-  }
+    platforms.forEach(p => { p.x -= scrollSpeed; });
+    cacti.forEach(c => { c.x -= scrollSpeed; });
+    carrots.forEach(carrot => { carrot.x -= scrollSpeed; });
 
-  platforms = platforms.filter(p => p.x + p.width > 0);
-  cacti = cacti.filter(c => c.x > -50);
-
-  horse.y += horse.velocityY;
-  horse.velocityY += 1;
-
-  let onPlatform = false;
-  let currentPlatformColor = 'brown'; // Default color for scoring
-
-  platforms.forEach(p => {
-    if (horse.x < p.x + p.width &&
-        horse.x + horse.width > p.x &&
-        horse.y + horse.height > p.y &&
-        horse.y < p.y + p.height &&
-        horse.velocityY >= 0) {
-      horse.jumping = false;
-      horse.velocityY = 0;
-      horse.y = p.y - horse.height;
-      onPlatform = true;
-      currentPlatformColor = 'brown';
+    if (platforms[platforms.length - 1].x < canvas.width) {
+        createPlatform(canvas.width + Math.random() * 200);
     }
-  });
 
-  if (!onPlatform && horse.y + horse.height >= groundPlatform.y) {
-    horse.y = groundPlatform.y - horse.height;
-    horse.jumping = false;
-    horse.velocityY = 0;
-    onPlatform = true;
-    currentPlatformColor = 'green';
-  }
+    platforms = platforms.filter(p => p.x + p.width > 0);
+    cacti = cacti.filter(c => c.x > -50);
+    carrots = carrots.filter(carrot => carrot.x > -50);
 
-  if (onPlatform) {
-    score += currentPlatformColor === 'green' ? deltaTime : 3 * deltaTime;
-  }
+    horse.y += horse.velocityY;
+    horse.velocityY += 1;
 
-  cacti.forEach(c => {
-    if (horse.x < c.x + c.size &&
-        horse.x + horse.width > c.x &&
-        horse.y + horse.height > c.y &&
-        horse.y < c.y + c.size) {
-      lives -= 1;
-      cacti.splice(cacti.indexOf(c), 1);
+    let onPlatform = false;
+
+    platforms.forEach(p => {
+        if (horse.x < p.x + p.width &&
+            horse.x + horse.width > p.x &&
+            horse.y + horse.height > p.y &&
+            horse.y < p.y + p.height &&
+            horse.velocityY >= 0) {
+            horse.jumping = false;
+            horse.velocityY = 0;
+            horse.y = p.y - horse.height;
+            onPlatform = true;
+        }
+    });
+
+    if (!onPlatform && horse.y + horse.height >= groundPlatform.y) {
+        horse.y = groundPlatform.y - horse.height;
+        horse.jumping = false;
+        horse.velocityY = 0;
     }
-  });
 
-  if (lives <= 0) {
-    alert('Game Over!');
-    return;
-  }
+    carrots.forEach((carrot, index) => {
+        if (horse.x < carrot.x + carrot.size &&
+            horse.x + horse.width > carrot.x &&
+            horse.y < carrot.y + carrot.size &&
+            horse.y + horse.height > carrot.y) {
+            carrots.splice(index, 1);
+            score += 10;
+            carrotsCollected += 1; // Increment the count of collected carrots
+        }
+    });
 
-  drawHorse();
-  drawPlatforms();
-  drawCacti();
-  drawLives();
-  drawScore();
-  requestAnimationFrame(updateGame);
+    cacti.forEach((cactus, index) => {
+        if (horse.x < cactus.x + cactus.size &&
+            horse.x + horse.width > cactus.x &&
+            horse.y < cactus.y + cactus.size &&
+            horse.y + horse.height > cactus.y) {
+            cacti.splice(index, 1);
+            lives -= 1; // Decrease lives when horse touches a cactus
+        }
+    });
+
+    if (lives <= 0) {
+        alert('Game Over!');
+        return;
+    }
+
+    drawHorse();
+    drawPlatforms();
+    drawCacti();
+    drawCarrots();
+    drawLives();
+    drawScore();
+    requestAnimationFrame(updateGame);
 }
 
 initPlatforms();
 requestAnimationFrame(updateGame);
-</script>
+
+    </script>
 </body>
 </html>
