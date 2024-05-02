@@ -214,10 +214,11 @@
             score += 1;
         }, 1000);
 
-        // Update the Poop Movement and Bouncing Logic
+
+        // Update the Poop Movement and Bouncing Logic with Platform Collision
         function updatePoops() {
-            const gravity = 0.5; // Gravity effect
-            const bounceFactor = -0.7; // How much velocity is retained after bouncing, negative for reversing direction
+            const gravity = 0.3; // Slightly reduce gravity for more game fun
+            const bounceFactor = -0.6; // Control bounce energy loss
 
             for (let i = poops.length - 1; i >= 0; i--) {
                 let poop = poops[i];
@@ -225,21 +226,30 @@
                 // Update horizontal position
                 poop.x += poop.vx;
 
-                // Update vertical position and velocity with gravity
+                // Apply gravity
                 poop.vy += gravity;
                 poop.y += poop.vy;
 
-                // Remove poop if it goes off the canvas horizontally
-                if (poop.x > canvas.width) {
+                // Horizontal screen bounds check (remove poop if it leaves the screen)
+                if (poop.x > canvas.width || poop.x < 0) {
                     poops.splice(i, 1);
                     continue;
                 }
 
                 // Bounce off the ground
                 if (poop.y + poop.size > canvas.height) {
-                    poop.y = canvas.height - poop.size; // Correct position to sit on the ground
-                    poop.vy *= bounceFactor; // Reverse and reduce vertical speed
+                    poop.y = canvas.height - poop.size;
+                    poop.vy *= bounceFactor;
                 }
+
+                // Check collision with platforms
+                platforms.forEach(platform => {
+                    if (poop.x + poop.size > platform.x && poop.x < platform.x + platform.width && // Check horizontal overlap
+                        poop.y + poop.size > platform.y && poop.y < platform.y + platform.height) { // Check vertical overlap
+                        poop.y = platform.y - poop.size; // Adjust poop position to sit on the platform
+                        poop.vy *= bounceFactor; // Apply bounce factor
+                    }
+                });
 
                 // Check collision with cacti
                 for (let j = cacti.length - 1; j >= 0; j--) {
@@ -255,6 +265,8 @@
                 }
             }
         }
+
+
 
 
         function updateGame(time) {
