@@ -75,13 +75,19 @@
                 height: platformHeight
             };
             platforms.push(p);
-            if (Math.random() > 0.7) {
-                createCactus(p.x + Math.random() * (p.width - 50), p.y - 50);
-            }
+
+            // Randomly decide whether to place a cactus or a carrot on the platform, not both
             if (Math.random() > 0.5) {
+                // Higher chance to create a cactus
+                if (Math.random() > 0.7) {
+                    createCactus(p.x + Math.random() * (p.width - 50), p.y - 50);
+                }
+            } else {
+                // Otherwise, create a carrot
                 createCarrot(p.x + p.width / 2, p.y - 30); // Carrots are placed in the middle of platforms
             }
         }
+
 
         function createCactus(x, y) {
             let size = Math.random() * (50 - 30) + 30;
