@@ -140,6 +140,79 @@
             createCactus(groundPlatform.x + 200, groundPlatform.y - 50);
         }
 
+        function drawHUD() {
+            const hudX = canvas.width - 20; // Set a margin from the right edge
+
+            // Draw Lives (Hearts)
+            ctx.font = "30px Arial";
+            ctx.textAlign = 'right';
+            ctx.fillText("❤️".repeat(lives), hudX, 40);
+
+            // Draw Score
+            ctx.font = "20px Arial";
+            ctx.fillText(`Score: ${score}`, hudX, 70);
+
+            // Draw Food Counter (Carrots Collected)
+            ctx.fillText(`Carrots: ${carrotsCollected}`, hudX, 100);
+        }
+
+        // Define a new array to hold poop projectiles
+        let poops = [];
+
+        // Function to shoot poop
+        function shootPoop() {
+            if (carrotsCollected > 0) {
+                // Adjust the x position to be slightly behind the horse (mimicking a rear-shot).
+                // The y position is set to the middle of the horse's height.
+                poops.push({
+                    x: horse.x + horse.width - 10,  // Start slightly behind the horse's rear
+                    y: horse.y + horse.height / 2, // Middle of the horse height
+                    size: 20, // Poop emoji size
+                    speed: 10  // Speed of the poop emoji
+                });
+                carrotsCollected -= 1; // Each shot costs one carrot
+            }
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.code === 'Space') {
+                shootPoop();
+            }
+        });
+
+
+
+        function drawPoops() {
+            poops.forEach(poop => {
+                ctx.font = `${poop.size}px Arial`;
+                ctx.fillText("💩", poop.x, poop.y);
+            });
+        }
+
+        function updatePoops() {
+            for (let i = poops.length - 1; i >= 0; i--) {
+                poops[i].x += poops[i].speed;
+
+                // Remove poop if it goes off the canvas
+                if (poops[i].x > canvas.width) {
+                    poops.splice(i, 1);
+                    continue;
+                }
+
+                // Check collision with cacti
+                for (let j = cacti.length - 1; j >= 0; j--) {
+                    if (poops[i].x + poops[i].size > cacti[j].x &&
+                        poops[i].x < cacti[j].x + cacti[j].size &&
+                        poops[i].y + poops[i].size > cacti[j].y &&
+                        poops[i].y < cacti[j].y + cacti[j].size) {
+                        cacti.splice(j, 1); // Remove cactus on collision
+                        poops.splice(i, 1); // Remove poop after hitting cactus
+                        break;
+                    }
+                }
+            }
+        }
+
         function updateGame(time) {
             const deltaTime = (time - lastTime) / 1000;
             lastTime = time;
@@ -148,6 +221,9 @@
             platforms.forEach(p => { p.x -= scrollSpeed; });
             cacti.forEach(c => { c.x -= scrollSpeed; });
             carrots.forEach(carrot => { carrot.x -= scrollSpeed; });
+
+            updatePoops();  // Update and move poops
+            drawPoops();    // Draw poops on the canvas
 
             if (platforms[platforms.length - 1].x < canvas.width) {
                 createPlatform(canvas.width + Math.random() * 200);
@@ -158,7 +234,7 @@
             carrots = carrots.filter(carrot => carrot.x > -50);
 
             horse.y += horse.velocityY;
-            horse.velocityY += 1; // Simulate gravity
+            horse.velocityY += 1;
 
             let onPlatform = false;
 
@@ -169,7 +245,7 @@
                     horse.y < p.y + p.height &&
                     horse.velocityY >= 0) {
                     horse.jumping = false;
-                    horse.midairJumpUsed = false; // Reset midair jump when touching a platform
+                    horse.midairJumpUsed = false;
                     horse.velocityY = 0;
                     horse.y = p.y - horse.height;
                     onPlatform = true;
@@ -179,11 +255,10 @@
             if (!onPlatform && horse.y + horse.height >= groundPlatform.y) {
                 horse.y = groundPlatform.y - horse.height;
                 horse.jumping = false;
-                horse.midairJumpUsed = false; // Reset midair jump when touching the ground
+                horse.midairJumpUsed = false;
                 horse.velocityY = 0;
             }
 
-            // Collision detection for carrots
             carrots.forEach((carrot, index) => {
                 if (horse.x < carrot.x + carrot.size &&
                     horse.x + horse.width > carrot.x &&
@@ -195,7 +270,6 @@
                 }
             });
 
-            // Collision detection for cacti
             cacti.forEach((cactus, index) => {
                 if (horse.x < cactus.x + cactus.size &&
                     horse.x + horse.width > cactus.x &&
@@ -215,12 +289,10 @@
             drawPlatforms();
             drawCacti();
             drawCarrots();
-            drawLives();
-            drawScore();
+            drawHUD(); // Call the drawHUD function to update the HUD elements
             requestAnimationFrame(updateGame);
         }
 
-        // Initialize the platforms and start the game loop
         initPlatforms();
         requestAnimationFrame(updateGame);
 
