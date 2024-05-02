@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Horse Runner</title>
@@ -9,12 +10,14 @@
             overflow: hidden;
             font-family: Arial, sans-serif;
         }
+
         canvas {
             background: #f0f0f0;
             display: block;
         }
     </style>
 </head>
+
 <body>
     <canvas id="gameCanvas"></canvas>
     <script>
@@ -138,84 +141,103 @@
         }
 
         function updateGame(time) {
-    const deltaTime = (time - lastTime) / 1000;
-    lastTime = time;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const deltaTime = (time - lastTime) / 1000;
+            lastTime = time;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    platforms.forEach(p => { p.x -= scrollSpeed; });
-    cacti.forEach(c => { c.x -= scrollSpeed; });
-    carrots.forEach(carrot => { carrot.x -= scrollSpeed; });
+            platforms.forEach(p => { p.x -= scrollSpeed; });
+            cacti.forEach(c => { c.x -= scrollSpeed; });
+            carrots.forEach(carrot => { carrot.x -= scrollSpeed; });
 
-    if (platforms[platforms.length - 1].x < canvas.width) {
-        createPlatform(canvas.width + Math.random() * 200);
-    }
+            if (platforms[platforms.length - 1].x < canvas.width) {
+                createPlatform(canvas.width + Math.random() * 200);
+            }
 
-    platforms = platforms.filter(p => p.x + p.width > 0);
-    cacti = cacti.filter(c => c.x > -50);
-    carrots = carrots.filter(carrot => carrot.x > -50);
+            platforms = platforms.filter(p => p.x + p.width > 0);
+            cacti = cacti.filter(c => c.x > -50);
+            carrots = carrots.filter(carrot => carrot.x > -50);
 
-    horse.y += horse.velocityY;
-    horse.velocityY += 1;
+            horse.y += horse.velocityY;
+            horse.velocityY += 1; // Simulate gravity
 
-    let onPlatform = false;
+            let onPlatform = false;
 
-    platforms.forEach(p => {
-        if (horse.x < p.x + p.width &&
-            horse.x + horse.width > p.x &&
-            horse.y + horse.height > p.y &&
-            horse.y < p.y + p.height &&
-            horse.velocityY >= 0) {
-            horse.jumping = false;
-            horse.velocityY = 0;
-            horse.y = p.y - horse.height;
-            onPlatform = true;
+            platforms.forEach(p => {
+                if (horse.x < p.x + p.width &&
+                    horse.x + horse.width > p.x &&
+                    horse.y + horse.height > p.y &&
+                    horse.y < p.y + p.height &&
+                    horse.velocityY >= 0) {
+                    horse.jumping = false;
+                    horse.midairJumpUsed = false; // Reset midair jump when touching a platform
+                    horse.velocityY = 0;
+                    horse.y = p.y - horse.height;
+                    onPlatform = true;
+                }
+            });
+
+            if (!onPlatform && horse.y + horse.height >= groundPlatform.y) {
+                horse.y = groundPlatform.y - horse.height;
+                horse.jumping = false;
+                horse.midairJumpUsed = false; // Reset midair jump when touching the ground
+                horse.velocityY = 0;
+            }
+
+            // Collision detection for carrots
+            carrots.forEach((carrot, index) => {
+                if (horse.x < carrot.x + carrot.size &&
+                    horse.x + horse.width > carrot.x &&
+                    horse.y < carrot.y + carrot.size &&
+                    horse.y + horse.height > carrot.y) {
+                    carrots.splice(index, 1);
+                    score += 10;
+                    carrotsCollected += 1;
+                }
+            });
+
+            // Collision detection for cacti
+            cacti.forEach((cactus, index) => {
+                if (horse.x < cactus.x + cactus.size &&
+                    horse.x + horse.width > cactus.x &&
+                    horse.y < cactus.y + cactus.size &&
+                    horse.y + horse.height > cactus.y) {
+                    cacti.splice(index, 1);
+                    lives -= 1;
+                }
+            });
+
+            if (lives <= 0) {
+                alert('Game Over!');
+                return;
+            }
+
+            drawHorse();
+            drawPlatforms();
+            drawCacti();
+            drawCarrots();
+            drawLives();
+            drawScore();
+            requestAnimationFrame(updateGame);
         }
-    });
 
-    if (!onPlatform && horse.y + horse.height >= groundPlatform.y) {
-        horse.y = groundPlatform.y - horse.height;
-        horse.jumping = false;
-        horse.velocityY = 0;
-    }
+        // Initialize the platforms and start the game loop
+        initPlatforms();
+        requestAnimationFrame(updateGame);
 
-    carrots.forEach((carrot, index) => {
-        if (horse.x < carrot.x + carrot.size &&
-            horse.x + horse.width > carrot.x &&
-            horse.y < carrot.y + carrot.size &&
-            horse.y + horse.height > carrot.y) {
-            carrots.splice(index, 1);
-            score += 10;
-            carrotsCollected += 1; // Increment the count of collected carrots
+        // Function to handle jumping logic
+        function jump() {
+            if (!horse.jumping) {
+                horse.velocityY = -jumpHeight;
+                horse.jumping = true;
+            } else if (!horse.midairJumpUsed) {
+                horse.velocityY = -jumpHeight; // Apply midair jump
+                horse.midairJumpUsed = true;
+            }
         }
-    });
 
-    cacti.forEach((cactus, index) => {
-        if (horse.x < cactus.x + cactus.size &&
-            horse.x + horse.width > cactus.x &&
-            horse.y < cactus.y + cactus.size &&
-            horse.y + horse.height > cactus.y) {
-            cacti.splice(index, 1);
-            lives -= 1; // Decrease lives when horse touches a cactus
-        }
-    });
-
-    if (lives <= 0) {
-        alert('Game Over!');
-        return;
-    }
-
-    drawHorse();
-    drawPlatforms();
-    drawCacti();
-    drawCarrots();
-    drawLives();
-    drawScore();
-    requestAnimationFrame(updateGame);
-}
-
-initPlatforms();
-requestAnimationFrame(updateGame);
+        document.addEventListener('mousedown', jump);
 
     </script>
 </body>
+
 </html>
