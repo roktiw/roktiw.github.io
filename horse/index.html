@@ -295,12 +295,19 @@
             }
         }, Math.random() * 2000 + 3000); // Random time between 3000ms (3 seconds) and 5000ms (5 seconds)
 
+        let nextSpeedIncreaseScore = 1000; // Initial score threshold for the first speed increase
 
 
         function updateGame(time) {
             const deltaTime = (time - lastTime) / 1000;
             lastTime = time;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Check if score has reached the threshold to increase speed
+            if (score >= nextSpeedIncreaseScore) {
+                scrollSpeed += 2; // Increase game scroll speed by 2
+                nextSpeedIncreaseScore += 1000; // Update the score threshold for the next increase
+            }
 
             platforms.forEach(p => { p.x -= scrollSpeed; });
             cacti.forEach(c => { c.x -= scrollSpeed; });
