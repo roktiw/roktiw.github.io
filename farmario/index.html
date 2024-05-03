@@ -190,12 +190,12 @@
         const foodProjectiles = [];
 
         const animalsData = {
-            "monkey": { "emoji": "🐒", "favoriteFood": ["banana", "peanut"], "sizeRange": [24, 36, 48] },
-            "squirrel": { "emoji": "🐿️", "favoriteFood": ["peanut", "strawberry"], "sizeRange": [24, 36, 48] },
-            "bird": { "emoji": "🦃", "favoriteFood": ["grass", "strawberry"], "sizeRange": [24, 36, 48] },
-            "rabbit": { "emoji": "🐇", "favoriteFood": ["carrot", "strawberry"], "sizeRange": [24, 36, 48] },
-            "turtle": { "emoji": "🐢", "favoriteFood": ["lettuce", "carrot"], "sizeRange": [24, 36, 48] },
-            "goat": { "emoji": "🐐", "favoriteFood": ["lettuce", "grass"], "sizeRange": [24, 36, 48] }
+            "monkey": { "emoji": "🐒", "favoriteFood": ["banana", "peanut"], "sizeRange": [30, 50, 70] },
+            "squirrel": { "emoji": "🐿️", "favoriteFood": ["peanut", "strawberry"], "sizeRange": [30, 50, 70] },
+            "bird": { "emoji": "🦃", "favoriteFood": ["grass", "strawberry"], "sizeRange": [30, 50, 70] },
+            "rabbit": { "emoji": "🐇", "favoriteFood": ["carrot", "strawberry"], "sizeRange": [30, 50, 70] },
+            "turtle": { "emoji": "🐢", "favoriteFood": ["lettuce", "carrot"], "sizeRange": [30, 50, 70] },
+            "goat": { "emoji": "🐐", "favoriteFood": ["lettuce", "grass"], "sizeRange": [30, 50, 70] }
         };
 
         const animals = [];
@@ -286,7 +286,7 @@
                         y: ySquare * squareSize + Math.random() * squareSize,
                         size: size,
                         currentSize: size,
-                        maxSize: 100,
+                        maxSize: 200,
                         totalFoodEaten: 0,
                         timesFed: 0,
                         tameStatus: false
@@ -406,7 +406,7 @@
                     if (Math.hypot(projectile.x - animal.x, projectile.y - animal.y) < animal.size) {
                         if (animalsData[animal.type].favoriteFood.includes(projectile.foodType)) {
                             animal.timesFed++;
-                            animal.size += 3; // Grow the animal when fed
+                            animal.size += 10; // Grow the animal when fed
                             animal.size = Math.min(animal.size, animal.maxSize); // Ensure size does not exceed maxSize
 
                             if (animal.timesFed >= 2 && !animal.tameStatus) {
@@ -426,6 +426,31 @@
             }
         }
 
+        function collect(eater) {
+            const squareSize = 500;
+            for (let i = foodItems.length - 1; i >= 0; i--) {
+                let food = foodItems[i];
+                let dx = eater.x - food.x;
+                let dy = eater.y - food.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let collectDistance = eater.size;
+
+                if (distance <= collectDistance) {
+                    eater.totalFoodEaten++;
+                    eater.totalFoodPossessed++;
+                    let xSquare = Math.floor(food.x / squareSize);
+                    let ySquare = Math.floor(food.y / squareSize);
+                    window.foodCountPerSquare[xSquare][ySquare]--;  // Decrement the count for the square
+                    foodItems.splice(i, 1); // Remove the food item
+
+                    // If the eater is an animal, increase its size
+                    if (animals.includes(eater)) {
+                        eater.size += 2; // Grow the animal when fed
+                        eater.size = Math.min(eater.size, eater.maxSize); // Ensure size does not exceed maxSize
+                    }
+                }
+            }
+        }
 
         function drawFoodProjectiles() {
             ctx.font = '24px Arial';
