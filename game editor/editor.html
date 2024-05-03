@@ -23,22 +23,40 @@
     <select id="item-type">
         <option value="🌳">Tree</option>
         <option value="🪨">Stone</option>
+        <!-- Add more game elements here -->
+        <option value="🌊">Water</option>
+        <option value="🔥">Fire</option>
     </select>
 
-    <button id="add-item">Dodaj element</button>
+    <!-- Add input fields for element positioning -->
+    <input type="number" id="item-x" placeholder="X position">
+    <input type="number" id="item-y" placeholder="Y position">
+
+    <button id="add-item">Add Element</button>
+
+    <!-- Add button for element removal -->
+    <button id="remove-item">Remove Element</button>
 
     <script>
         document.getElementById('add-item').addEventListener('click', function() {
-            var gameBoard = document.getElementById('game-board');
-            var newItem = document.createElement('div');
             var itemType = document.getElementById('item-type').value;
+            var itemX = document.getElementById('item-x').value;
+            var itemY = document.getElementById('item-y').value;
 
-            newItem.classList.add('game-item');
-            newItem.textContent = itemType;
-            newItem.style.top = Math.random() * (gameBoard.offsetHeight - 50) + 'px';
-            newItem.style.left = Math.random() * (gameBoard.offsetWidth - 50) + 'px';
+            var item = document.createElement('div');
+            item.classList.add('game-item');
+            item.style.left = itemX + 'px';
+            item.style.top = itemY + 'px';
+            item.textContent = itemType;
 
-            gameBoard.appendChild(newItem);
+            document.getElementById('game-board').appendChild(item);
+        });
+
+        document.getElementById('remove-item').addEventListener('click', function() {
+            var gameBoard = document.getElementById('game-board');
+            if (gameBoard.lastChild) {
+                gameBoard.removeChild(gameBoard.lastChild);
+            }
         });
     </script>
 </body>
