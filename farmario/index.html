@@ -174,7 +174,8 @@
         const staticObjects = [
             { type: 'rock', emoji: '🪨', positions: [], sizeRange: [24, 36, 48] },
             { type: 'tree', emoji: '🌳', positions: [], sizeRange: [140, 180, 200] },
-            { type: 'mushroom', emoji: '🍄', positions: [], sizeRange: [30, 45, 60] }
+            { type: 'mushroom', emoji: '🍄', positions: [], sizeRange: [30, 45, 60] },
+            { type: 'house', emoji: '🏠', positions: [{ x: player.x, y: player.y }], size: 2 }
         ];
 
         const foodTypes = {
@@ -445,7 +446,7 @@
 
                     // If the eater is an animal, increase its size
                     if (animals.includes(eater)) {
-                        eater.size += 2; // Grow the animal when fed
+                        eater.size += 1; // Grow the animal when fed
                         eater.size = Math.min(eater.size, eater.maxSize); // Ensure size does not exceed maxSize
                     }
                 }
