@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zelda Game Editor</title>
+    <style>
+        #game-board {
+            position: relative;
+            height: 600px;
+            width: 800px;
+            border: 1px solid black;
+        }
+        .game-item {
+            position: absolute;
+            height: 50px;
+            width: 50px;
+            font-size: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board"></div>
+
+    <select id="item-type">
+        <option value="🌳">Tree</option>
+        <option value="🪨">Stone</option>
+    </select>
+
+    <button id="add-item">Dodaj element</button>
+
+    <script>
+        document.getElementById('add-item').addEventListener('click', function() {
+            var gameBoard = document.getElementById('game-board');
+            var newItem = document.createElement('div');
+            var itemType = document.getElementById('item-type').value;
+
+            newItem.classList.add('game-item');
+            newItem.textContent = itemType;
+            newItem.style.top = Math.random() * (gameBoard.offsetHeight - 50) + 'px';
+            newItem.style.left = Math.random() * (gameBoard.offsetWidth - 50) + 'px';
+
+            gameBoard.appendChild(newItem);
+        });
+    </script>
+</body>
+</html>
