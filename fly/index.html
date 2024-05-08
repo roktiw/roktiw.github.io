@@ -17,6 +17,7 @@
     <div id="level">Level: 1</div>
     <div id="time">Total time: 0</div> <!-- Add this line -->
     <div id="levelTime" style="color: red;">Level time: 30</div> <!-- Add this line -->
+
     <script>
         var score = 0;
         var selectedFly = null;
@@ -70,15 +71,29 @@
 
             if (type === 'fly') {
                 emoji.addEventListener('click', function () {
-                    selectedFly = this;
+                    if (!this.classList.contains('landed')) {
+                        selectedFly = this;
+                    }
                 });
             } else {
                 emoji.addEventListener('click', function () {
                     if (selectedFly) {
                         moveFlyToPoo(selectedFly, this);
+                        selectedFly = null; // Reset selectedFly after moving it to a poo
                     }
                 });
             }
+        }
+
+        var emojiSize = 50; // Replace with the actual size of your emojis
+        emoji.style.left = `${Math.random() * (window.innerWidth - emojiSize)}px`;
+        emoji.style.top = `${Math.random() * (window.innerHeight - emojiSize)}px`;
+
+        // Assuming `emojiSize` is the size of your emojis and `placeEmoji` is the function that places them
+        function placeEmoji() {
+            var x = Math.random() * (window.innerWidth - emojiSize);
+            var y = Math.random() * (window.innerHeight - emojiSize);
+            // Place the emoji at (x, y)
         }
 
         function moveFlyToPoo(fly, poo) {
@@ -89,14 +104,15 @@
 
             setTimeout(function () {
                 poo.remove();
+                fly.remove();
                 score++;
                 pooCount--;
                 document.getElementById('score').innerText = 'Score: ' + score;
-                if (pooCount === 0) {
-                    levelUp();
+
+                if (pooCount === 0) { // Add this line
+                    levelUp(); // Add this line
                 }
-                fly.style.transition = '';
-            }, 2000); // Fly takes 2 seconds to reach the poo
+            }, 2000);
         }
 
         function clearEmojis() {
@@ -121,8 +137,26 @@
             generateEmojis();
         }
 
+        var flyClicked = false;
+        var pooClicked = false;
+
+        // Assuming `poo` is the poo emoji element
+        poo.addEventListener('click', function (event) {
+            pooClicked = true;
+            event.stopPropagation();
+        });
+
+        // Assuming `fly` is the fly emoji element
+        fly.addEventListener('click', function (event) {
+            if (event.target !== fly || pooClicked) {
+                // The click was not on the fly or a poo was clicked before, ignore it
+                pooClicked = false;
+                return;
+            }
+        });
 
     </script>
+
 </body>
 
 </html>
