@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .emoji {
+            position: absolute;
+            cursor: pointer;
+            font-size: 64px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="score">Score: 0</div>
+    <div id="level">Level: 1</div>
+    <div id="time">Total time: 0</div> <!-- Add this line -->
+    <div id="levelTime" style="color: red;">Level time: 30</div> <!-- Add this line -->
+    <script>
+        var score = 0;
+        var selectedFly = null;
+        var level = 1;
+        var pooCount = 0;
+        var time = 0; // Add this line
+        var levelTime = 30; // Add this line
+        var levelTimer; // Add this line
+
+        // Start the time counter
+        setInterval(function () {
+            time++;
+            document.getElementById('time').innerText = 'Time: ' + time;
+        }, 1000); // Increment time every 1 second
+
+        // Start the level timer
+        startLevelTimer(); // Add this line
+
+        // Generate flies and poos
+        generateEmojis();
+
+        function startLevelTimer() {
+            levelTime = 30;
+            document.getElementById('levelTime').innerText = 'Level time: ' + levelTime;
+            levelTimer = setInterval(function () {
+                levelTime--;
+                document.getElementById('levelTime').innerText = 'Level time: ' + levelTime;
+                if (levelTime === 0) {
+                    clearInterval(levelTimer);
+                    // Handle level timeout here
+                }
+            }, 1000);
+        }
+
+        function generateEmojis() {
+            for (let i = 0; i < level; i++) {
+                createEmoji('🪰', 'fly');
+                createEmoji('💩', 'poo');
+                pooCount++;
+            }
+        }
+
+        function createEmoji(symbol, type) {
+            var emoji = document.createElement('div');
+            emoji.innerHTML = symbol;
+            emoji.classList.add('emoji');
+            emoji.classList.add(type);
+            emoji.style.left = `${Math.random() * window.innerWidth}px`;
+            emoji.style.top = `${Math.random() * window.innerHeight}px`;
+            document.body.appendChild(emoji);
+
+            if (type === 'fly') {
+                emoji.addEventListener('click', function () {
+                    selectedFly = this;
+                });
+            } else {
+                emoji.addEventListener('click', function () {
+                    if (selectedFly) {
+                        moveFlyToPoo(selectedFly, this);
+                    }
+                });
+            }
+        }
+
+        function moveFlyToPoo(fly, poo) {
+            var pooPosition = poo.getBoundingClientRect();
+            fly.style.transition = 'all 2s';
+            fly.style.left = `${pooPosition.left}px`;
+            fly.style.top = `${pooPosition.top}px`;
+
+            setTimeout(function () {
+                poo.remove();
+                score++;
+                pooCount--;
+                document.getElementById('score').innerText = 'Score: ' + score;
+                if (pooCount === 0) {
+                    levelUp();
+                }
+                fly.style.transition = '';
+            }, 2000); // Fly takes 2 seconds to reach the poo
+        }
+
+        function clearEmojis() {
+            var flies = document.getElementsByClassName('fly');
+            var poos = document.getElementsByClassName('poo');
+
+            while (flies[0]) {
+                flies[0].parentNode.removeChild(flies[0]);
+            }
+
+            while (poos[0]) {
+                poos[0].parentNode.removeChild(poos[0]);
+            }
+        }
+
+        function levelUp() {
+            level++;
+            document.getElementById('level').innerText = 'Level: ' + level;
+            clearInterval(levelTimer);
+            clearEmojis(); // Add this line
+            startLevelTimer();
+            generateEmojis();
+        }
+
+
+    </script>
+</body>
+
+</html>
