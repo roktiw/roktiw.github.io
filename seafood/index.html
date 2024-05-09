@@ -2,7 +2,9 @@
 <html>
 
 <head>
-    <title>Flappy Evolution Game</title>
+    <title>Seafood 🐛🦐🦞🦑🐠🐡🦈🐋🐳🛥️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
         #game {
             width: 90vw;
@@ -12,6 +14,13 @@
             overflow: hidden;
             background: url('background.webp') repeat-x;
             animation: moveBackground 20s linear infinite;
+        }
+
+        @media (max-width: 600px) {
+            #game {
+                width: 100vw;
+                height: 100vh;
+            }
         }
 
         @keyframes moveBackground {
@@ -110,10 +119,9 @@
             }
         }
 
-        document.body.onclick = function () {
-            // Handle player going up
-            jump();
-        }
+        // With this
+        document.body.addEventListener('click', jump);
+        document.body.addEventListener('touchstart', jump);
 
         function applyGravity() {
             if (gravityIntervalId) {
@@ -131,14 +139,11 @@
             }, 20);
         }
 
-        document.body.onkeyup = function (e) {
+        document.body.addEventListener('keyup', function (e) {
             if (e.keyCode == 32) {
-                // Handle player going up
-                var currentBottom = parseInt(player.style.bottom);
-                player.style.bottom = currentBottom + jumpHeight + 'px';
-                applyGravity();
+                jump();
             }
-        }
+        });
 
         document.body.onclick = function () {
             // Handle player going up
@@ -283,10 +288,37 @@
         }
 
         function gameOver() {
-            // End the game
-            clearInterval(gravityIntervalId);
-            clearInterval(jumpIntervalId);
-            alert('Game Over');
+            // Display an alert with a game over message
+            alert("Game Over. Your points " + pointsCounter.textContent + ". Whoa! What a evolution, what a seafood! Lets play again!");
+
+            // Reset the game
+            resetGame();
+        }
+
+        function resetGame() {
+            // Reset the player's life
+            playerLife = 3;
+            updateLife();
+
+            // Reset the player's evolution
+            playerEvolutionIndex = 0;
+            player.innerText = playerEvolution[playerEvolutionIndex];
+            player.style.fontSize = playerSizes[playerEvolutionIndex];
+
+            // Reset the food speed
+            foodSpeed = 2;
+
+            // Reset the level
+            level = 1;
+
+            // Reset the food eaten count
+            foodEaten = 0;
+            foodCounter.textContent = 'Food eaten: ' + foodEaten;
+
+            // Reset the points
+            pointsCounter.textContent = 'Points: 0';
+
+            playerLife = 3;
         }
 
         function gameLoop() {
