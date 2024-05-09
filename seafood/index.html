@@ -4,24 +4,26 @@
 <head>
     <title>Flappy Evolution Game</title>
     <style>
-        @keyframes moveBackground {
-            from {
-                background-position: 0 0;
-            }
-
-            to {
-                background-position: -100% 0;
-            }
-        }
-
         #game {
             width: 90vw;
             height: 90vh;
             border: 1px solid black;
             position: relative;
             overflow: hidden;
-            background: url('/background.webp') repeat-x;
-            animation: moveBackground 5s linear infinite;
+            background: url('background.webp') repeat-x;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+
+            0%,
+            100% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 100% 0;
+            }
         }
 
         #player {
@@ -30,8 +32,10 @@
             position: absolute;
             bottom: 0;
             transition: bottom 0.5s;
-            /* Adjust the duration as needed */
-
+            margin-left: 90px;
+            /* This will position the player 140px from the left */
+            transform: scaleX(-1);
+            /* This will flip the emoji horizontally */
         }
     </style>
 </head>
@@ -45,10 +49,10 @@
             <!-- Food will be generated here -->
         </div>
         <div id="hud">
-            <p id="lives">❤️❤️❤️</p>
-            <p id="food-counter">Food eaten: 0</p>
-            <p id="points-counter">Points: 0</p>
-
+            <div id="lives">❤️❤️❤️</div>
+            <div id="food-counter">Food eaten: 0</div>
+            <div id="points-counter">Points: 0</div>
+            <div id="level">Level: 1</div>
         </div>
     </div>
 
@@ -191,33 +195,33 @@
         function checkCollision() {
             var playerRect = player.getBoundingClientRect();
             var foods = food.children;
-        
+
             for (var i = 0; i < foods.length; i++) {
                 var foodElement = foods[i];
                 var foodRect = foodElement.getBoundingClientRect();
-        
+
                 // Check if the player's position overlaps with the food's position
                 if (playerRect.left < foodRect.right &&
                     playerRect.right > foodRect.left &&
                     playerRect.top < foodRect.bottom &&
                     playerRect.bottom > foodRect.top) {
-        
+
                     // Check if the player and the food are at the same or lower evolution level
                     if (Number(foodElement.dataset.evolutionLevel) <= playerEvolutionIndex) {
                         // Remove the food element
                         food.removeChild(foodElement);
-        
+
                         // Increase the count of food eaten
                         foodEaten++;
-        
+
                         // Update the food counter
                         foodCounter.textContent = 'Food eaten: ' + foodEaten;
-        
+
                         // Increase the player's points
                         var points = parseInt(pointsCounter.textContent.split(": ")[1]);
                         points += 1 + Number(foodElement.dataset.evolutionLevel);
                         pointsCounter.textContent = 'Points: ' + points;
-        
+
                         // If the player has eaten enough food, evolve to the next level
                         if (foodEaten >= 1) {
                             // If the player is in the boat form, reset the evolution index and increase the food speed
@@ -227,11 +231,11 @@
                             } else {
                                 playerEvolutionIndex++;
                             }
-        
+
                             player.innerText = playerEvolution[playerEvolutionIndex];
                             player.style.fontSize = playerSizes[playerEvolutionIndex];
                             foodEaten = 0; // Reset the food eaten count
-        
+
                             // Also reset the food counter display
                             foodCounter.textContent = 'Food eaten: ' + foodEaten;
                         }
