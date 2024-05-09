@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flappy Evolution Game</title>
+    <style>
+        @keyframes moveBackground {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: -100% 0;
+            }
+        }
+
+        #game {
+            width: 90vw;
+            height: 90vh;
+            border: 1px solid black;
+            position: relative;
+            overflow: hidden;
+            background: url('/background.webp') repeat-x;
+            animation: moveBackground 5s linear infinite;
+        }
+
+        #player {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game">
+        <div id="player">
+            🐛
+        </div>
+        <div id="food">
+            <!-- Food will be generated here -->
+        </div>
+        <div id="lives">
+            ❤️❤️❤️
+        </div>
+    </div>
+
+    <script>
+        var player = document.getElementById('player');
+        var food = document.getElementById('food');
+        var lives = document.getElementById('lives');
+
+        var playerEvolution = ['🐛', '🦐', '🦞', '🦑', '🐠', '🐡', '🦈', '🐋', '🐳', '🛥️'];
+        var playerSizes = ['50px', '60px', '70px', '80px', '90px', '100px', '110px', '120px', '130px', '140px'];
+
+        var playerEvolutionIndex = 0;
+        var foodEaten = 0;
+
+        var foodSpeed = 2; // Adjust this value to change the speed of the food
+
+        var level = 1; // Start at level 1
+        var foodEatenThisLevel = 0; // Track the number of food eaten in the current level
+
+        var gravityIntervalId;
+        var jumpHeight = 200; // The height the player jumps when the space key is pressed
+        var gravity = 5; // The speed at which the player falls
+
+        var jumpIntervalId;
+        var jumpSpeed = 20; // The speed at which the player jumps
+
+        function jump() {
+            if (jumpIntervalId) {
+                clearInterval(jumpIntervalId);
+            }
+
+            var targetBottom = parseInt(player.style.bottom) + jumpHeight;
+            jumpIntervalId = setInterval(function () {
+                var currentBottom = parseInt(player.style.bottom);
+                if (currentBottom >= targetBottom) {
+                    clearInterval(jumpIntervalId);
+                    jumpIntervalId = null;
+                    applyGravity();
+                } else {
+                    player.style.bottom = currentBottom + jumpSpeed + 'px';
+                }
+            }, 10); // Increase the frequency of the setInterval function
+        }
+
+        document.body.onkeyup = function (e) {
+            if (e.keyCode == 32) {
+                // Handle player going up
+                jump();
+            }
+        }
+
+        document.body.onclick = function () {
+            // Handle player going up
+            jump();
+        }
+
+        function applyGravity() {
+            if (gravityIntervalId) {
+                clearInterval(gravityIntervalId);
+            }
+
+            gravityIntervalId = setInterval(function () {
+                var currentBottom = parseInt(player.style.bottom);
+                if (currentBottom <= 0) {
+                    clearInterval(gravityIntervalId);
+                    gravityIntervalId = null;
+                } else {
+                    player.style.bottom = currentBottom - gravity + 'px';
+                }
+            }, 20);
+        }
+
+        document.body.onkeyup = function (e) {
+            if (e.keyCode == 32) {
+                // Handle player going up
+                var currentBottom = parseInt(player.style.bottom);
+                player.style.bottom = currentBottom + jumpHeight + 'px';
+                applyGravity();
+            }
+        }
+
+        document.body.onclick = function () {
+            // Handle player going up
+            var currentBottom = parseInt(player.style.bottom);
+            player.style.bottom = currentBottom + jumpHeight + 'px';
+            applyGravity();
+        }
+
+        // Apply gravity when the game starts
+        applyGravity();
+
+
+        document.body.onkeyup = function (e) {
+            if (e.keyCode == 32) {
+                // Handle player going up
+                player.style.bottom = parseInt(player.style.bottom) + 50 + 'px';
+            }
+        }
+
+        var playerEvolutionIndex = 0;
+        player.innerText = playerEvolution[playerEvolutionIndex];
+        player.style.fontSize = playerSizes[playerEvolutionIndex];
+        player.style.bottom = '90%'; // Set the player to start near the top of the game canvas
+        player.style.left = '0px'; // Set the player to start at the left edge of the game canvas
+
+
+        function generateFood() {
+            // Generate food at random height at the right edge of the game canvas
+            var newFood = document.createElement('div');
+            newFood.style.position = 'absolute';
+            newFood.style.right = '0px';
+            newFood.style.top = Math.random() * (game.clientHeight - 50) + 'px';
+
+            // Select the food item
+            var foodIndex;
+            if (Math.random() < 0.25) {
+                // 25% chance to select the food item for the current level
+                foodIndex = Math.min(level - 1, playerEvolution.length - 1);
+            } else {
+                // 75% chance to select a random food item
+                foodIndex = Math.floor(Math.random() * playerEvolution.length);
+            }
+
+            newFood.innerText = playerEvolution[foodIndex];
+            newFood.style.fontSize = playerSizes[foodIndex]; // Set the font size, not the width and height
+
+            food.appendChild(newFood);
+
+            // Schedule the next food generation
+            // Generate food more frequently as the level increases
+            setTimeout(generateFood, 2000 / level);
+        }
+
+        function checkCollision() {
+            // Check if player collides with food
+            // If food is of player's evolution form or lower, player eats food
+            // If food is of higher form, player loses a life
+        }
+
+        function evolve() {
+            player.style.width = playerSizes[playerEvolutionIndex];
+            player.style.height = playerSizes[playerEvolutionIndex];
+        }
+
+        function gameOver() {
+            // Check if player has lost all lives
+            // If yes, end game
+        }
+
+        function gameLoop() {
+            // Get all food elements
+            var foods = food.children;
+
+            for (var i = 0; i < foods.length; i++) {
+                var foodElement = foods[i];
+
+                // Get the current right position
+                var currentRight = parseInt(foodElement.style.right);
+
+                // Update the right position
+                foodElement.style.right = (currentRight + foodSpeed) + 'px';
+
+                // If the food has moved off the left edge of the game canvas, remove it
+                if (currentRight > game.clientWidth) {
+                    food.removeChild(foodElement);
+                }
+            }
+
+            // Call the game loop again after a short delay
+            setTimeout(gameLoop, 20);
+        }
+
+        generateFood(); // Generate initial food
+        gameLoop(); // Start the game loop
+    </script>
+
+</body>
+
+</html>
