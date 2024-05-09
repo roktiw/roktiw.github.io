@@ -52,7 +52,6 @@
             <div id="lives">❤️❤️❤️</div>
             <div id="food-counter">Food eaten: 0</div>
             <div id="points-counter">Points: 0</div>
-            <div id="level">Level: 1</div>
         </div>
     </div>
 
@@ -228,6 +227,7 @@
                             if (playerEvolutionIndex === playerEvolution.length - 1) {
                                 playerEvolutionIndex = 0;
                                 foodSpeed *= 2;
+                                level++; // Increment the level
                             } else {
                                 playerEvolutionIndex++;
                             }
