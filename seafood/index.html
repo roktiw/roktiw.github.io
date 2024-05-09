@@ -29,6 +29,9 @@
             height: 50px;
             position: absolute;
             bottom: 0;
+            transition: bottom 0.5s;
+            /* Adjust the duration as needed */
+
         }
     </style>
 </head>
@@ -67,7 +70,7 @@
         var gravity = 5; // The speed at which the player falls
 
         var jumpIntervalId;
-        var jumpSpeed = 20; // The speed at which the player jumps
+        var jumpSpeed = 5; // The speed at which the player jumps
 
         function jump() {
             if (jumpIntervalId) {
@@ -148,10 +151,10 @@
         player.style.bottom = '90%'; // Set the player to start near the top of the game canvas
         player.style.left = '0px'; // Set the player to start at the left edge of the game canvas
 
-
         function generateFood() {
             // Generate food at random height at the right edge of the game canvas
             var newFood = document.createElement('div');
+            newFood.classList.add('seafood'); // Add this line
             newFood.style.position = 'absolute';
             newFood.style.right = '0px';
             newFood.style.top = Math.random() * (game.clientHeight - 50) + 'px';
@@ -169,6 +172,8 @@
             newFood.innerText = playerEvolution[foodIndex];
             newFood.style.fontSize = playerSizes[foodIndex]; // Set the font size, not the width and height
 
+            newFood.dataset.evolutionLevel = foodIndex; // Store the food's evolution level
+
             food.appendChild(newFood);
 
             // Schedule the next food generation
@@ -177,10 +182,41 @@
         }
 
         function checkCollision() {
-            // Check if player collides with food
-            // If food is of player's evolution form or lower, player eats food
-            // If food is of higher form, player loses a life
+            var playerRect = player.getBoundingClientRect();
+            var foods = food.children;
+
+            for (var i = 0; i < foods.length; i++) {
+                var foodElement = foods[i];
+                var foodRect = foodElement.getBoundingClientRect();
+
+                // Check if the player's position overlaps with the food's position
+                if (playerRect.left < foodRect.right &&
+                    playerRect.right > foodRect.left &&
+                    playerRect.top < foodRect.bottom &&
+                    playerRect.bottom > foodRect.top) {
+
+                    // Check if the player and the food are at the same or lower evolution level
+                    if (Number(foodElement.dataset.evolutionLevel) <= playerEvolutionIndex) {
+                        // Remove the food element
+                        food.removeChild(foodElement);
+
+                        // Increase the count of food eaten
+                        foodEaten++;
+
+                        // If the player has eaten enough food, evolve to the next level
+                        if (foodEaten >= 10) {
+                            playerEvolutionIndex++;
+                            player.innerText = playerEvolution[playerEvolutionIndex];
+                            player.style.fontSize = playerSizes[playerEvolutionIndex];
+                            foodEaten = 0; // Reset the food eaten count
+                        }
+                    }
+                }
+            }
         }
+
+        setInterval(checkCollision, 100); // Check for collisions every 100 milliseconds
+
 
         function evolve() {
             player.style.width = playerSizes[playerEvolutionIndex];
@@ -194,7 +230,7 @@
 
         function gameLoop() {
             // Get all food elements
-            var foods = food.children;
+            var foods = document.querySelectorAll('.seafood');
 
             for (var i = 0; i < foods.length; i++) {
                 var foodElement = foods[i];
@@ -209,6 +245,7 @@
                 if (currentRight > game.clientWidth) {
                     food.removeChild(foodElement);
                 }
+
             }
 
             // Call the game loop again after a short delay
