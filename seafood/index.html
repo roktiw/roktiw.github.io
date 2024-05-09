@@ -73,14 +73,17 @@
 
         var gravityIntervalId;
         var jumpHeight = 200; // The height the player jumps when the space key is pressed
-        var gravity = 5; // The speed at which the player falls
+        var gravity = 3; // The speed at which the player falls after jumping
 
         var jumpIntervalId;
-        var jumpSpeed = 5; // The speed at which the player jumps
+        var jumpSpeed = 7; // The speed at which the player jumps   
 
         var foodCounter = document.getElementById('food-counter');
 
         var pointsCounter = document.getElementById('points-counter');
+
+        let playerLife = 3; // Initialize player's life to 3
+        let isImmortal = false;
 
         function jump() {
             if (jumpIntervalId) {
@@ -239,6 +242,21 @@
                             // Also reset the food counter display
                             foodCounter.textContent = 'Food eaten: ' + foodEaten;
                         }
+
+                    } else if (!isImmortal) {
+                        // Player collided with food that's at a higher evolution level
+                        // Decrease the player's life
+                        playerLife--;
+                        updateLife();
+                        if (playerLife <= 0) {
+                            gameOver();
+                        } else {
+                            // Make the player immortal for 3 seconds
+                            isImmortal = true;
+                            setTimeout(() => {
+                                isImmortal = false;
+                            }, 3000);
+                        }
                     }
                 }
             }
@@ -246,6 +264,18 @@
 
         setInterval(checkCollision, 100); // Check for collisions every 100 milliseconds
 
+        function updateLife() {
+            // Remove all existing hearts
+            while (lives.firstChild) {
+                lives.firstChild.remove();
+            }
+            // Add a heart for each life
+            for (let i = 0; i < playerLife; i++) {
+                const heart = document.createElement('div');
+                heart.textContent = '❤️';
+                lives.appendChild(heart);
+            }
+        }
 
         function evolve() {
             player.style.width = playerSizes[playerEvolutionIndex];
@@ -253,8 +283,10 @@
         }
 
         function gameOver() {
-            // Check if player has lost all lives
-            // If yes, end game
+            // End the game
+            clearInterval(gravityIntervalId);
+            clearInterval(jumpIntervalId);
+            alert('Game Over');
         }
 
         function gameLoop() {
