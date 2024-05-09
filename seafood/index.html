@@ -44,8 +44,9 @@
         <div id="food">
             <!-- Food will be generated here -->
         </div>
-        <div id="lives">
-            ❤️❤️❤️
+        <div id="hud">
+            <p id="lives">❤️❤️❤️</p>
+            <p id="food-counter">Food eaten: 0</p>
         </div>
     </div>
 
@@ -71,6 +72,9 @@
 
         var jumpIntervalId;
         var jumpSpeed = 5; // The speed at which the player jumps
+
+        var foodCounter = document.getElementById('food-counter');
+
 
         function jump() {
             if (jumpIntervalId) {
@@ -202,6 +206,9 @@
 
                         // Increase the count of food eaten
                         foodEaten++;
+
+                        // Update the food counter
+                        foodCounter.textContent = 'Food eaten: ' + foodEaten;
 
                         // If the player has eaten enough food, evolve to the next level
                         if (foodEaten >= 10) {
