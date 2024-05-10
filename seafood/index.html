@@ -76,12 +76,17 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             font-family: Arial, Helvetica, sans-serif;
         }
 
         .scrollable-content {
-            height: 80vh;
-            overflow-y: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         #playButton {
@@ -113,9 +118,12 @@
         <div class="modal-content">
             <div class="scrollable-content">
                 <!-- Add your welcome message or any other content here -->
-                <h1>Seafood Diet 🐛🦐🦞🦑🐟🐠🐡🦈🐋🐳🛥️</h1>
+                <img src="seafood.webp" alt="Seafood" style="width: 50%; height: auto; border-radius: 10%;">
+                <h1>Seafood Diet</h1>
+                <h3>🐛🦐🦞🦑🐟🐠🐡🦈🐋🐳🛥️</h3>
                 <p>Welcome to the Seafood game! Eat the seafood to evolve and earn points. Avoid the seafood that's at a
-                    higher evolution level than you. Use the space bar or tap the screen to jump and collect the food. Good luck!</p>
+                    higher evolution level than you. Use the space bar or tap the screen to jump and collect the food.
+                    Good luck!</p>
                 <i>I am on seafood diet - I see food, I eat it</i>
                 <button id="playButton">Play</button>
             </div>
