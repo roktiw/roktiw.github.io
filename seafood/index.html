@@ -21,6 +21,11 @@
                 width: 100vw;
                 height: 100vh;
             }
+
+            #player {
+                margin-left: 30px;
+                /* Set to 30px for screens 600px or smaller */
+            }
         }
 
         @keyframes moveBackground {
@@ -82,10 +87,10 @@
 
         var gravityIntervalId;
         var jumpHeight = 200; // The height the player jumps when the space key is pressed
-        var gravity = 3; // The speed at which the player falls after jumping
+        var gravity = 7; // The speed at which the player falls after jumping
 
         var jumpIntervalId;
-        var jumpSpeed = 7; // The speed at which the player jumps   
+        var jumpSpeed = 3; // The speed at which the player jumps   
 
         var foodCounter = document.getElementById('food-counter');
 
