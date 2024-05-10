@@ -327,13 +327,14 @@
                         points += 1 + Number(foodElement.dataset.evolutionLevel);
                         pointsCounter.textContent = 'Points: ' + points;
 
-                        // If the player has eaten enough food, evolve to the next level
+                        // EVOLUTION CYCLE If the player has eaten enough food, evolve to the next level
                         if (foodEaten >= 1) {
                             // If the player is in the boat form, reset the evolution index and increase the food speed
                             if (playerEvolutionIndex === playerEvolution.length - 1) {
                                 playerEvolutionIndex = 0;
                                 foodSpeed *= 2;
                                 level++; // Increment the level
+                                player.lives++; // Increment the player's life
                             } else {
                                 playerEvolutionIndex++;
                             }
