@@ -80,7 +80,6 @@
             background-color: #ececec;
         }
 
-
         .favicon {
             width: 16px;
             height: 16px;
@@ -94,6 +93,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        
     </style>
     <script>
         function assignLink(keyElement) {
@@ -106,6 +106,14 @@
 
 <body>
     <div class="keyboard"></div>
+    <div id="dialog" hidden>
+        <label for="url">URL:</label>
+        <input type="text" id="url">
+        <label for="site-name">Site Name:</label>
+        <input type="text" id="site-name">
+        <button id="save">Save</button>
+        <button id="cancel">Cancel</button>
+    </div>
 
     <script>
         window.onload = function () {
