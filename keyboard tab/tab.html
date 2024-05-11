@@ -34,6 +34,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
+        .key:hover {
+            background-color: #d8d8d8;
+        }
+
         .key::before {
             content: "";
             display: block;
@@ -42,9 +46,6 @@
             border-bottom: 1px solid #bbb;
         }
 
-        .key:hover {
-            background-color: #f0f0f0;
-        }
 
         .key .letter {
             font-size: 44px;
@@ -70,17 +71,22 @@
             background-color: #f8f8f8;
             border: 1px solid #ccc;
             padding: 5px;
-            width: 85%; /* adjust as needed */
+            width: 85%;
             overflow: hidden;
             border-radius: 15px;
         }
-        
+
+        .info-container:hover {
+            background-color: #ececec;
+        }
+
+
         .favicon {
             width: 16px;
             height: 16px;
             margin-right: 5px;
         }
-        
+
         .name {
             font-size: 12px;
             margin-top: 3px;
@@ -88,7 +94,6 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-        
     </style>
     <script>
         function assignLink(keyElement) {
