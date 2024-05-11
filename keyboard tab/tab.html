@@ -4,28 +4,63 @@
 <head>
     <style>
         .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 5px;
+            height: 75vh;
             width: 100%;
-            margin: 0 auto;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         .row {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 10px;
+            display: contents;
         }
 
         .key {
-            padding: 20px;
-            border: 1px solid #ccc;
             text-align: center;
+            border: 1.5px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 3px;
             cursor: pointer;
-            width: 100%;
+            transition: background-color 0.3s ease;
+            position: relative;
         }
 
-        @media (max-width: 600px) {
-            .key {
-                padding: 10px;
-            }
+        .key:hover {
+            background-color: #f0f0f0;
+        }
+
+        .key .letter {
+            font-size: 44px;
+            font-weight: bold;
+        }
+
+        .key .name {
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .key .icon {
+            font-size: 22px;
+            margin-top: 3px;
+        }
+
+        .info-container {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .favicon {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
         }
     </style>
     <script>
@@ -38,60 +73,115 @@
 </head>
 
 <body>
-    <div class="keyboard">
-        <!-- Row 1 -->
-        <div class="row">
-            <div class="key">1</div>
-            <div class="key">2</div>
-            <div class="key">3</div>
-            <div class="key">4</div>
-            <div class="key">5</div>
-            <div class="key">6</div>
-            <div class="key">7</div>
-            <div class="key">8</div>
-            <div class="key">9</div>
-            <div class="key">0</div>
-        </div>
-        <!-- Row 2 -->
-        <div class="row">
-            <div class="key">q</div>
-            <div class="key">w</div>
-            <div class="key">e</div>
-            <div class="key">r</div>
-            <div class="key">t</div>
-            <div class="key">y</div>
-            <div class="key">u</div>
-            <div class="key">i</div>
-            <div class="key">o</div>
-            <div class="key">p</div>
-        </div>
-        <!-- Row 3 -->
-        <div class="row">
-            <div class="key">a</div>
-            <div class="key">s</div>
-            <div class="key">d</div>
-            <div class="key">f</div>
-            <div class="key">g</div>
-            <div class="key">h</div>
-            <div class="key">j</div>
-            <div class="key">k</div>
-            <div class="key">l</div>
-            <div class="key">;</div>
-        </div>
-        <!-- Row 4 -->
-        <div class="row">
-            <div class="key">z</div>
-            <div class="key">x</div>
-            <div class="key">c</div>
-            <div class="key">v</div>
-            <div class="key">b</div>
-            <div class="key">n</div>
-            <div class="key">m</div>
-            <div class="key">,</div>
-            <div class="key">.</div>
-            <div class="key">/</div>
-        </div>
-    </div>
+    <div class="keyboard"></div>
+
+    <script>
+        window.onload = function () {
+            var keys = [
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+                ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'],
+                ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/']
+            ];
+            var links = {
+                '1': 'https://www.yahoo.com',
+                '2': 'https://www.live.com',
+                '3': 'https://www.instagram.com',
+                '4': 'https://www.linkedin.com',
+                '5': 'https://www.pinterest.com',
+                '6': 'https://www.wordpress.com',
+                '7': 'https://www.blogspot.com',
+                '8': 'https://www.apple.com',
+                '9': 'https://www.adobe.com',
+                '0': 'https://www.tumblr.com',
+                'q': 'https://www.quora.com',
+                'w': 'https://www.wikipedia.org',
+                'e': 'https://www.ebay.com',
+                'r': 'https://www.reddit.com',
+                't': 'https://www.twitter.com',
+                'y': 'https://www.youtube.com',
+                'u': 'https://www.uber.com',
+                'i': 'https://www.instagram.com',
+                'o': 'https://www.opera.com',
+                'p': 'https://www.pinterest.com',
+                'a': 'https://www.amazon.com',
+                's': 'https://www.spotify.com',
+                'd': 'https://www.dropbox.com',
+                'f': 'https://www.facebook.com',
+                'g': 'https://www.google.com',
+                'h': 'https://www.hulu.com',
+                'j': 'https://www.justwatch.com',
+                'k': 'https://www.kickstarter.com',
+                'l': 'https://www.linkedin.com',
+                ';': 'https://www.semanticscholar.org',
+                'z': 'https://www.zillow.com',
+                'x': 'https://www.xbox.com',
+                'c': 'https://www.cnn.com',
+                'v': 'https://www.vimeo.com',
+                'b': 'https://www.bing.com',
+                'n': 'https://www.netflix.com',
+                'm': 'https://www.microsoft.com',
+                ',': 'https://www.comma.com',
+                '.': 'https://www.dot.com',
+                '/': 'https://www.slash.com'
+            };
+            var keyboard = document.querySelector('.keyboard');
+            keys.forEach(function (rowKeys) {
+                var row = document.createElement('div');
+                row.className = 'row';
+                rowKeys.forEach(function (key) {
+                    var keyElement = document.createElement('div');
+                    keyElement.className = 'key';
+                    keyElement.dataset.key = key.toUpperCase(); // Set the data-key attribute
+
+                    var letterElement = document.createElement('div');
+                    letterElement.className = 'letter';
+                    letterElement.textContent = key;
+                    keyElement.appendChild(letterElement);
+
+                    if (links[key]) {
+                        var infoContainer = document.createElement('div');
+                        infoContainer.className = 'info-container';
+
+                        var linkText = links[key].replace('http://www.', '').replace('https://www.', '');
+
+                        // Fetch and display the favicon
+                        var faviconElement = document.createElement('img');
+                        faviconElement.className = 'favicon';
+                        faviconElement.src = 'http://www.google.com/s2/favicons?domain=' + linkText;
+                        infoContainer.appendChild(faviconElement);
+
+                        var nameElement = document.createElement('div');
+                        nameElement.className = 'name';
+                        nameElement.textContent = linkText;
+                        infoContainer.appendChild(nameElement);
+
+                        keyElement.appendChild(infoContainer);
+
+                        keyElement.dataset.link = links[key];
+                        keyElement.title = links[key];
+                        keyElement.addEventListener('click', function () {
+                            window.location = this.dataset.link;
+                        });
+                    }
+                    row.appendChild(keyElement);
+                });
+                keyboard.appendChild(row);
+            });
+        };
+
+        document.addEventListener('keydown', function (event) {
+            var key = event.key.toUpperCase();
+            var keyElement = document.querySelector('.key[data-key="' + key + '"]');
+            if (keyElement) {
+                var link = keyElement.dataset.link;
+                if (link) {
+                    window.location.href = link;
+                }
+            }
+        });
+
+    </script>
 </body>
 
 </html>
