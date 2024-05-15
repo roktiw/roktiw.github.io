@@ -81,3 +81,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         taskCheckboxes.forEach((checkbox, index) => {
+            checkbox.checked = savedData.tasks[index];
+        });
+        breakfastInput.value = savedData.meals.breakfast;
+        lunchInput.value = savedData.meals.lunch;
+        dinnerInput.value = savedData.meals.dinner;
+    }
+        
+    
+    function getSelectedData(icons, attribute) {
+        const selectedIcon = Array.from(icons).find(icon => icon.classList.contains('selected'));
+        return selectedIcon ? selectedIcon.getAttribute(attribute) : null;
+    }
+
+    function selectIcon(icons, value, attribute) {
+        icons.forEach(icon => {
+            if (icon.getAttribute(attribute) === value) {
+                icon.classList.add('selected');
+            }
+        });
+    }
+}
+);
+
