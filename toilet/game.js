@@ -23,7 +23,7 @@ class Player {
     this.speed = 10;
   }
   draw() {
-    ctx.font = `${canvas.height * 0.1}px Arial`; // Set the font size to be 10% of the canvas height
+    ctx.font = `${canvas.height * 0.1}px Arial`;
     ctx.fillText("🚽", this.x, this.y);
   }
   moveLeft() {
@@ -36,11 +36,12 @@ class Player {
 
 let player = new Player();
 
-
 class Item {
-  constructor(type, emoji) {
+  constructor(type, emoji, points, effect) {
     this.type = type;
     this.emoji = emoji;
+    this.points = points;
+    this.effect = effect;
     this.width = 50;
     this.height = 50;
     this.x = Math.random() * (canvas.width - this.width);
@@ -55,6 +56,8 @@ class Item {
   }
 }
 
+let items = [];
+
 function init() {
   player = new Player();
   items = [];
@@ -66,11 +69,37 @@ function init() {
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   player.draw();
+  
   if (Math.random() < 0.02) {
-    const type = Math.random() < 0.5 ? "toilet" : "cellphone";
-    const emoji = type === "toilet" ? "💩" : "📱";
-    items.push(new Item(type, emoji));
+    const itemType = Math.random() < 0.5 ? "cellPhone" : Math.random() < 0.7 ? "pool" : Math.random() < 0.9 ? "toiletPaper" : "plunger";
+    const itemEmoji = itemType === "toiletPaper" ? "🧻" : itemType === "plunger" ? "🪠" : itemType === "pool" ? "💩" : "📱";
+    let itemPoints = 0;
+    let itemEffect = "";
+
+    switch (itemType) {
+      case "toiletPaper":
+        itemPoints = 3;
+        itemEffect = "score";
+        break;
+      case "plunger":
+        if (lives < 3) {
+          itemPoints = 1;
+          itemEffect = "life";
+        }
+        break;
+      case "pool":
+        itemPoints = 1;
+        itemEffect = "score";
+        break;
+      case "cellPhone":
+        itemPoints = -1;
+        itemEffect = "life";
+        break;
+    }
+
+    items.push(new Item(itemType, itemEmoji, itemPoints, itemEffect));
   }
+
   items.forEach((item, index) => {
     item.update();
     item.draw();
@@ -83,13 +112,16 @@ function gameLoop() {
       item.x + item.width > player.x
     ) {
       items.splice(index, 1);
-      if (item.type === "toilet") {
-        score += 1;
-      } else {
+      if (item.effect === "score") {
+        score += item.points;
+      } else if (item.effect === "life" && lives < 3) {
+        lives += item.points;
+      } else if (item.type === "cellPhone" && lives > 0) {
         lives -= 1;
       }
     }
   });
+
   if (movingLeft) {
     player.moveLeft();
   }
@@ -99,8 +131,8 @@ function gameLoop() {
   function drawScoreAndLives() {
     ctx.font = "30px Arial";
     ctx.fillStyle = "#000";
-    ctx.fillText(`Score: ${score}`, 10, 40); // Draws score 10px from the left and 30px down from the top
-    ctx.fillText(`Lives: ${lives}`, canvas.width - 120, 40); // Draws lives 100px from the right and 30px down from the top
+    ctx.fillText(`Score: ${score}`, 10, 40);
+    ctx.fillText(`Lives: ${lives}`, canvas.width - 120, 40);
   }
   drawScoreAndLives();
   if (lives > 0) {
