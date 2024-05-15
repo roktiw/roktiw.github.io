@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Planner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="planner">
+        <header>
+            <h1>Daily Planner</h1>
+            <div class="date">
+                <label for="date">Date:</label>
+                <input type="date" id="date">
+            </div>
+        </header>
+        <section class="overview">
+            <div class="weather">
+                <label>Weather:</label>
+                <div class="icons">
+                    <span class="weather-icon" data-weather="sunny">☀️</span>
+                    <span class="weather-icon" data-weather="partly-cloudy">⛅</span>
+                    <span class="weather-icon" data-weather="cloudy">☁️</span>
+                    <span class="weather-icon" data-weather="rainy">🌧️</span>
+                    <span class="weather-icon" data-weather="snowy">❄️</span>
+                </div>
+            </div>
+            <div class="mood">
+                <label>Mood:</label>
+                <div class="icons">
+                    <span class="mood-icon" data-mood="very-happy">😁</span>
+                    <span class="mood-icon" data-mood="happy">😊</span>
+                    <span class="mood-icon" data-mood="neutral">😐</span>
+                    <span class="mood-icon" data-mood="sad">😔</span>
+                    <span class="mood-icon" data-mood="very-sad">😢</span>
+                </div>
+            </div>
+            <div class="water">
+                <label>Water:</label>
+                <div class="cups">
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                    <span class="cup">💧</span>
+                </div>
+            </div>
+        </section>
+        <section class="tasks">
+            <div class="today">
+                <h2>Today</h2>
+                <ul>
+                    <li><input type="checkbox" class="task"> Task 1</li>
+                    <li><input type="checkbox" class="task"> Task 2</li>
+                    <li><input type="checkbox" class="task"> Task 3</li>
+                    <li><input type="checkbox" class="task"> Task 4</li>
+                </ul>
+            </div>
+            <div class="meals">
+                <div class="meal">
+                    <label for="breakfast">Breakfast:</label>
+                    <input type="text" id="breakfast">
+                </div>
+                <div class="meal">
+                    <label for="lunch">Lunch:</label>
+                    <input type="text" id="lunch">
+                </div>
+                <div class="meal">
+                    <label for="dinner">Dinner:</label>
+                    <input type="text" id="dinner">
+                </div>
+            </div>
+            <div class="tomorrow">
+                <h2>Tomorrow</h2>
+                <ul>
+                    <li><input type="checkbox" class="task"> Task 1</li>
+                    <li><input type="checkbox" class="task"> Task 2</li>
+                    <li><input type="checkbox" class="task"> Task 3</li>
+                    <li><input type="checkbox" class="task"> Task 4</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
