@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris-like Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #game-board {
+            width: 200px;
+            height: 400px;
+            border: 1px solid #000;
+            background-color: #fff;
+            position: relative;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+        }
+
+        .cell {
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            text-align: center;
+            line-height: 1.5em;
+            font-size: 1.5em;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        #controls button {
+            margin: 0 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #scoreboard {
+            text-align: center;
+        }
+
+        #scoreboard div {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="game-board"></div>
+        <div id="controls">
+            <button id="rotate">Rotate</button>
+            <button id="left">L</button>
+            <button id="right">R</button>
+            <button id="down">Down</button>
+        </div>
+        <div id="scoreboard">
+            <div>Next: <span id="next-column"></span></div>
+            <div>Points: <span id="points">0</span></div>
+            <div>Level: <span id="level">1</span></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gameBoard = document.getElementById('game-board');
+            const rotateButton = document.getElementById('rotate');
+            const leftButton = document.getElementById('left');
+            const rightButton = document.getElementById('right');
+            const downButton = document.getElementById('down');
+            const pointsDisplay = document.getElementById('points');
+            const levelDisplay = document.getElementById('level');
+            const nextColumnDisplay = document.getElementById('next-column');
+
+            const boardWidth = 10;
+            const boardHeight = 20;
+            let points = 0;
+            let level = 1;
+            let gameInterval;
+
+            const emojis = ['😀', '😎', '😍', '🤖', '👾'];
+            const initialColumn = () => [
+                emojis[Math.floor(Math.random() * emojis.length)],
+                emojis[Math.floor(Math.random() * emojis.length)],
+                emojis[Math.floor(Math.random() * emojis.length)]
+            ];
+
+            let currentColumn = initialColumn();
+            let nextColumn = initialColumn();
+
+            const drawBoard = () => {
+                gameBoard.innerHTML = '';
+                for (let y = 0; y < boardHeight; y++) {
+                    for (let x = 0; x < boardWidth; x++) {
+                        const cell = document.createElement('div');
+                        cell.classList.add('cell');
+                        gameBoard.appendChild(cell);
+                    }
+                }
+            };
+
+            const drawColumn = (column, position) => {
+                column.forEach((emoji, index) => {
+                    const x = position.x;
+                    const y = position.y + index;
+                    if (y >= 0 && y < boardHeight) {
+                        const cell = gameBoard.children[y * boardWidth + x];
+                        cell.textContent = emoji;
+                    }
+                });
+            };
+
+            const isPositionValid = (column, position) => {
+                return column.every((_, index) => {
+                    const x = position.x;
+                    const y = position.y + index;
+                    return x >= 0 && x < boardWidth && y < boardHeight && (y < 0 || !gameBoard.children[y * boardWidth + x].textContent);
+                });
+            };
+
+            let columnPosition = { x: Math.floor(boardWidth / 2), y: -3 };
+
+            const moveColumn = (direction) => {
+                let newPosition = { ...columnPosition };
+                switch (direction) {
+                    case 'left':
+                        newPosition.x = columnPosition.x - 1;
+                        break;
+                    case 'right':
+                        newPosition.x = columnPosition.x + 1;
+                        break;
+                    case 'down':
+                        newPosition.y = columnPosition.y + 1;
+                        break;
+                }
+                if (isPositionValid(currentColumn, newPosition)) {
+                    columnPosition = newPosition;
+                } else if (direction === 'down') {
+                    placeColumn();
+                }
+                updateGame();
+            };
+
+            const rotateColumn = () => {
+                const rotatedColumn = [currentColumn[2], currentColumn[1], currentColumn[0]];
+                if (isPositionValid(rotatedColumn, columnPosition)) {
+                    currentColumn = rotatedColumn;
+                }
+                updateGame();
+            };
+
+            const placeColumn = () => {
+                currentColumn.forEach((emoji, index) => {
+                    const x = columnPosition.x;
+                    const y = columnPosition.y + index;
+                    if (y >= 0 && y < boardHeight) {
+                        const cell = gameBoard.children[y * boardWidth + x];
+                        cell.textContent = emoji;
+                    }
+                });
+                checkForMatches();
+                currentColumn = nextColumn;
+                nextColumn = initialColumn();
+                columnPosition = { x: Math.floor(boardWidth / 2), y: -3 };
+            };
+
+            const checkForMatches = () => {
+                // This function should check the board for matching rows/columns and remove them
+                // For simplicity, it's left as a placeholder
+            };
+
+            const updateGame = () => {
+                drawBoard();
+                drawColumn(currentColumn, columnPosition);
+                nextColumnDisplay.textContent = nextColumn.join('');
+            };
+
+            rotateButton.addEventListener('click', rotateColumn);
+            leftButton.addEventListener('click', () => moveColumn('left'));
+            rightButton.addEventListener('click', () => moveColumn('right'));
+            downButton.addEventListener('click', () => moveColumn('down'));
+
+            const startGame = () => {
+                gameInterval = setInterval(() => {
+                    moveColumn('down');
+                }, 1000);
+            };
+
+            startGame();
+            updateGame();
+        });
+    </script>
+</body>
+</html>
