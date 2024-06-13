@@ -55,6 +55,7 @@
         let board = Array.from({ length: rows }, () => Array(cols).fill(null));
         let currentColumn = [];
         let currentPosition = { x: 0, y: 0 };
+        let gameInterval;
 
         function createBoard() {
             gameBoard.innerHTML = '';
@@ -82,6 +83,7 @@
             currentPosition = { x: 0, y: Math.floor(cols / 2) };
             if (board[0][currentPosition.y] !== null || board[1][currentPosition.y] !== null || board[2][currentPosition.y] !== null) {
                 alert('Game Over!');
+                clearInterval(gameInterval);
                 board = Array.from({ length: rows }, () => Array(cols).fill(null));
             } else {
                 board[0][currentPosition.y] = currentColumn[0];
@@ -179,7 +181,7 @@
             for (let col = 0; col < cols; col++) {
                 for (let row = 0; row < rows - 2; row++) {
                     if (board[row][col] && board[row][col] === board[row + 1][col] && board[row][col] === board[row + 2][col]) {
-                        matches.push([row, col], [row + 1, col], [row + 2], col);
+                        matches.push([row, col], [row + 1, col], [row + 2, col]);
                     }
                 }
             }
@@ -202,8 +204,13 @@
             updateBoard();
         }
 
-        createBoard();
-        dropNewColumn();
+        function startGame() {
+            createBoard();
+            dropNewColumn();
+            gameInterval = setInterval(moveDown, 700);
+        }
+
+        startGame();
     </script>
 </body>
 </html>
