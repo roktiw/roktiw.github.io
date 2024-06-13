@@ -6,205 +6,204 @@
     <title>Tetris-like Game</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
         }
-
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        #game-board {
-            width: 200px;
-            height: 400px;
-            border: 1px solid #000;
-            background-color: #fff;
-            position: relative;
-            margin-bottom: 20px;
+        #gameBoard {
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(20, 1fr);
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+            background-color: #333;
         }
-
         .cell {
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            text-align: center;
-            line-height: 1.5em;
-            font-size: 1.5em;
-        }
-
-        #controls {
+            width: 30px;
+            height: 30px;
+            background-color: #fff;
             display: flex;
+            align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            font-size: 20px;
         }
-
-        #controls button {
-            margin: 0 5px;
-            padding: 10px;
+        #controls {
+            margin-top: 20px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
             font-size: 16px;
-        }
-
-        #scoreboard {
-            text-align: center;
-        }
-
-        #scoreboard div {
-            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="game-board"></div>
-        <div id="controls">
-            <button id="rotate">Rotate</button>
-            <button id="left">L</button>
-            <button id="right">R</button>
-            <button id="down">Down</button>
-        </div>
-        <div id="scoreboard">
-            <div>Next: <span id="next-column"></span></div>
-            <div>Points: <span id="points">0</span></div>
-            <div>Level: <span id="level">1</span></div>
-        </div>
+    <div id="gameBoard"></div>
+    <div id="controls">
+        <button onclick="rotateColumn()">Rotate</button>
+        <button onclick="moveLeft()">Left</button>
+        <button onclick="moveRight()">Right</button>
+        <button onclick="moveDown()">Down</button>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const gameBoard = document.getElementById('game-board');
-            const rotateButton = document.getElementById('rotate');
-            const leftButton = document.getElementById('left');
-            const rightButton = document.getElementById('right');
-            const downButton = document.getElementById('down');
-            const pointsDisplay = document.getElementById('points');
-            const levelDisplay = document.getElementById('level');
-            const nextColumnDisplay = document.getElementById('next-column');
+        const rows = 20;
+        const cols = 10;
+        const gameBoard = document.getElementById('gameBoard');
+        let board = Array.from({ length: rows }, () => Array(cols).fill(null));
+        let currentColumn = [];
+        let currentPosition = { x: 0, y: 0 };
 
-            const boardWidth = 10;
-            const boardHeight = 20;
-            let points = 0;
-            let level = 1;
-            let gameInterval;
+        function createBoard() {
+            gameBoard.innerHTML = '';
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${row}-${col}`;
+                    gameBoard.appendChild(cell);
+                }
+            }
+        }
 
-            const emojis = ['😀', '😎', '😍', '🤖', '👾'];
-            const initialColumn = () => [
-                emojis[Math.floor(Math.random() * emojis.length)],
-                emojis[Math.floor(Math.random() * emojis.length)],
-                emojis[Math.floor(Math.random() * emojis.length)]
-            ];
+        function updateBoard() {
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.getElementById(`cell-${row}-${col}`);
+                    cell.textContent = board[row][col];
+                }
+            }
+        }
 
-            let currentColumn = initialColumn();
-            let nextColumn = initialColumn();
+        function dropNewColumn() {
+            currentColumn = getNewColumn();
+            currentPosition = { x: 0, y: Math.floor(cols / 2) };
+            if (board[0][currentPosition.y] !== null || board[1][currentPosition.y] !== null || board[2][currentPosition.y] !== null) {
+                alert('Game Over!');
+                board = Array.from({ length: rows }, () => Array(cols).fill(null));
+            } else {
+                board[0][currentPosition.y] = currentColumn[0];
+                board[1][currentPosition.y] = currentColumn[1];
+                board[2][currentPosition.y] = currentColumn[2];
+            }
+            updateBoard();
+        }
 
-            const drawBoard = () => {
-                gameBoard.innerHTML = '';
-                for (let y = 0; y < boardHeight; y++) {
-                    for (let x = 0; x < boardWidth; x++) {
-                        const cell = document.createElement('div');
-                        cell.classList.add('cell');
-                        gameBoard.appendChild(cell);
+        function getNewColumn() {
+            const emojis = ['😀', '😃', '😄', '😁', '😆'];
+            return [emojis[Math.floor(Math.random() * emojis.length)],
+                    emojis[Math.floor(Math.random() * emojis.length)],
+                    emojis[Math.floor(Math.random() * emojis.length)]];
+        }
+
+        function rotateColumn() {
+            const temp = currentColumn[2];
+            currentColumn[2] = currentColumn[1];
+            currentColumn[1] = currentColumn[0];
+            currentColumn[0] = temp;
+            board[currentPosition.x][currentPosition.y] = currentColumn[0];
+            board[currentPosition.x + 1][currentPosition.y] = currentColumn[1];
+            board[currentPosition.x + 2][currentPosition.y] = currentColumn[2];
+            updateBoard();
+        }
+
+        function moveLeft() {
+            if (currentPosition.y > 0 && board[currentPosition.x][currentPosition.y - 1] === null && board[currentPosition.x + 1][currentPosition.y - 1] === null && board[currentPosition.x + 2][currentPosition.y - 1] === null) {
+                board[currentPosition.x][currentPosition.y] = null;
+                board[currentPosition.x + 1][currentPosition.y] = null;
+                board[currentPosition.x + 2][currentPosition.y] = null;
+                currentPosition.y--;
+                board[currentPosition.x][currentPosition.y] = currentColumn[0];
+                board[currentPosition.x + 1][currentPosition.y] = currentColumn[1];
+                board[currentPosition.x + 2][currentPosition.y] = currentColumn[2];
+                updateBoard();
+            }
+        }
+
+        function moveRight() {
+            if (currentPosition.y < cols - 1 && board[currentPosition.x][currentPosition.y + 1] === null && board[currentPosition.x + 1][currentPosition.y + 1] === null && board[currentPosition.x + 2][currentPosition.y + 1] === null) {
+                board[currentPosition.x][currentPosition.y] = null;
+                board[currentPosition.x + 1][currentPosition.y] = null;
+                board[currentPosition.x + 2][currentPosition.y] = null;
+                currentPosition.y++;
+                board[currentPosition.x][currentPosition.y] = currentColumn[0];
+                board[currentPosition.x + 1][currentPosition.y] = currentColumn[1];
+                board[currentPosition.x + 2][currentPosition.y] = currentColumn[2];
+                updateBoard();
+            }
+        }
+
+        function moveDown() {
+            if (currentPosition.x < rows - 3 && board[currentPosition.x + 3][currentPosition.y] === null) {
+                board[currentPosition.x][currentPosition.y] = null;
+                board[currentPosition.x + 1][currentPosition.y] = null;
+                board[currentPosition.x + 2][currentPosition.y] = null;
+                currentPosition.x++;
+                board[currentPosition.x][currentPosition.y] = currentColumn[0];
+                board[currentPosition.x + 1][currentPosition.y] = currentColumn[1];
+                board[currentPosition.x + 2][currentPosition.y] = currentColumn[2];
+                updateBoard();
+            } else {
+                clearMatches();
+                dropNewColumn();
+            }
+        }
+
+        function clearMatches() {
+            let matches = checkForMatches(board);
+            while (matches.length > 0) {
+                for (let match of matches) {
+                    let [row, col] = match;
+                    board[row][col] = null;
+                }
+                applyGravity();
+                matches = checkForMatches(board);
+            }
+        }
+
+        function checkForMatches(board) {
+            let matches = [];
+
+            // Check horizontal matches
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols - 2; col++) {
+                    if (board[row][col] && board[row][col] === board[row][col + 1] && board[row][col] === board[row][col + 2]) {
+                        matches.push([row, col], [row, col + 1], [row, col + 2]);
                     }
                 }
-            };
+            }
 
-            const drawColumn = (column, position) => {
-                column.forEach((emoji, index) => {
-                    const x = position.x;
-                    const y = position.y + index;
-                    if (y >= 0 && y < boardHeight) {
-                        const cell = gameBoard.children[y * boardWidth + x];
-                        cell.textContent = emoji;
+            // Check vertical matches
+            for (let col = 0; col < cols; col++) {
+                for (let row = 0; row < rows - 2; row++) {
+                    if (board[row][col] && board[row][col] === board[row + 1][col] && board[row][col] === board[row + 2][col]) {
+                        matches.push([row, col], [row + 1, col], [row + 2], col);
                     }
-                });
-            };
-
-            const isPositionValid = (column, position) => {
-                return column.every((_, index) => {
-                    const x = position.x;
-                    const y = position.y + index;
-                    return x >= 0 && x < boardWidth && y < boardHeight && (y < 0 || !gameBoard.children[y * boardWidth + x].textContent);
-                });
-            };
-
-            let columnPosition = { x: Math.floor(boardWidth / 2), y: -3 };
-
-            const moveColumn = (direction) => {
-                let newPosition = { ...columnPosition };
-                switch (direction) {
-                    case 'left':
-                        newPosition.x = columnPosition.x - 1;
-                        break;
-                    case 'right':
-                        newPosition.x = columnPosition.x + 1;
-                        break;
-                    case 'down':
-                        newPosition.y = columnPosition.y + 1;
-                        break;
                 }
-                if (isPositionValid(currentColumn, newPosition)) {
-                    columnPosition = newPosition;
-                } else if (direction === 'down') {
-                    placeColumn();
-                }
-                updateGame();
-            };
+            }
 
-            const rotateColumn = () => {
-                const rotatedColumn = [currentColumn[2], currentColumn[1], currentColumn[0]];
-                if (isPositionValid(rotatedColumn, columnPosition)) {
-                    currentColumn = rotatedColumn;
-                }
-                updateGame();
-            };
+            return matches;
+        }
 
-            const placeColumn = () => {
-                currentColumn.forEach((emoji, index) => {
-                    const x = columnPosition.x;
-                    const y = columnPosition.y + index;
-                    if (y >= 0 && y < boardHeight) {
-                        const cell = gameBoard.children[y * boardWidth + x];
-                        cell.textContent = emoji;
+        function applyGravity() {
+            for (let col = 0; col < cols; col++) {
+                let emptySpots = 0;
+                for (let row = rows - 1; row >= 0; row--) {
+                    if (board[row][col] === null) {
+                        emptySpots++;
+                    } else if (emptySpots > 0) {
+                        board[row + emptySpots][col] = board[row][col];
+                        board[row][col] = null;
                     }
-                });
-                checkForMatches();
-                currentColumn = nextColumn;
-                nextColumn = initialColumn();
-                columnPosition = { x: Math.floor(boardWidth / 2), y: -3 };
-            };
+                }
+            }
+            updateBoard();
+        }
 
-            const checkForMatches = () => {
-                // This function should check the board for matching rows/columns and remove them
-                // For simplicity, it's left as a placeholder
-            };
-
-            const updateGame = () => {
-                drawBoard();
-                drawColumn(currentColumn, columnPosition);
-                nextColumnDisplay.textContent = nextColumn.join('');
-            };
-
-            rotateButton.addEventListener('click', rotateColumn);
-            leftButton.addEventListener('click', () => moveColumn('left'));
-            rightButton.addEventListener('click', () => moveColumn('right'));
-            downButton.addEventListener('click', () => moveColumn('down'));
-
-            const startGame = () => {
-                gameInterval = setInterval(() => {
-                    moveColumn('down');
-                }, 1000);
-            };
-
-            startGame();
-            updateGame();
-        });
+        createBoard();
+        dropNewColumn();
     </script>
 </body>
 </html>
