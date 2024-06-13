@@ -29,6 +29,11 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            transition: opacity 0.5s ease, background-color 0.5s ease;
+        }
+        .disappear {
+            opacity: 0;
+            background-color: #fff; /* Reset background color to white */
         }
         #controls {
             margin-top: 20px;
@@ -74,6 +79,7 @@
                 for (let col = 0; col < cols; col++) {
                     const cell = document.getElementById(`cell-${row}-${col}`);
                     cell.textContent = board[row][col];
+                    cell.style.backgroundColor = board[row][col] ? '#fff' : '#333'; // Reset background color
                 }
             }
         }
@@ -149,19 +155,29 @@
                 updateBoard();
             } else {
                 clearMatches();
-                dropNewColumn();
             }
         }
 
         function clearMatches() {
             let matches = checkForMatches(board);
-            while (matches.length > 0) {
+            if (matches.length > 0) {
                 for (let match of matches) {
                     let [row, col] = match;
-                    board[row][col] = null;
+                    const cell = document.getElementById(`cell-${row}-${col}`);
+                    cell.classList.add('disappear');
                 }
-                applyGravity();
-                matches = checkForMatches(board);
+                setTimeout(() => {
+                    for (let match of matches) {
+                        let [row, col] = match;
+                        board[row][col] = null;
+                        const cell = document.getElementById(`cell-${row}-${col}`);
+                        cell.classList.remove('disappear');
+                    }
+                    applyGravity();
+                    dropNewColumn();
+                }, 500); // Wait for the animation to complete (0.5s)
+            } else {
+                dropNewColumn();
             }
         }
 
