@@ -94,10 +94,10 @@
         }
 
         function getNewColumn() {
-            const emojis = ['😀', '😃', '😄', '😁', '😆'];
-            return [emojis[Math.floor(Math.random() * emojis.length)],
-                    emojis[Math.floor(Math.random() * emojis.length)],
-                    emojis[Math.floor(Math.random() * emojis.length)]];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
+            return [fruits[Math.floor(Math.random() * fruits.length)],
+                    fruits[Math.floor(Math.random() * fruits.length)],
+                    fruits[Math.floor(Math.random() * fruits.length)]];
         }
 
         function rotateColumn() {
@@ -171,8 +171,14 @@
             // Check horizontal matches
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols - 2; col++) {
-                    if (board[row][col] && board[row][col] === board[row][col + 1] && board[row][col] === board[row][col + 2]) {
-                        matches.push([row, col], [row, col + 1], [row, col + 2]);
+                    let startCol = col;
+                    while (col < cols - 1 && board[row][col] && board[row][col] === board[row][col + 1]) {
+                        col++;
+                    }
+                    if (col - startCol >= 2) { // 3 or more in a row
+                        for (let i = startCol; i <= col; i++) {
+                            matches.push([row, i]);
+                        }
                     }
                 }
             }
@@ -180,8 +186,14 @@
             // Check vertical matches
             for (let col = 0; col < cols; col++) {
                 for (let row = 0; row < rows - 2; row++) {
-                    if (board[row][col] && board[row][col] === board[row + 1][col] && board[row][col] === board[row + 2][col]) {
-                        matches.push([row, col], [row + 1, col], [row + 2, col]);
+                    let startRow = row;
+                    while (row < rows - 1 && board[row][col] && board[row][col] === board[row + 1][col]) {
+                        row++;
+                    }
+                    if (row - startRow >= 2) { // 3 or more in a column
+                        for (let i = startRow; i <= row; i++) {
+                            matches.push([i, col]);
+                        }
                     }
                 }
             }
