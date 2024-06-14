@@ -224,6 +224,40 @@
                 }
             }
 
+            // Check diagonal matches (bottom-left to top-right)
+            for (let row = 0; row < rows - 2; row++) {
+                for (let col = 0; col < cols - 2; col++) {
+                    let startRow = row;
+                    let startCol = col;
+                    while (startRow < rows - 1 && startCol < cols - 1 && board[startRow][startCol] && board[startRow][startCol] === board[startRow + 1][startCol + 1]) {
+                        startRow++;
+                        startCol++;
+                    }
+                    if (startRow - row >= 2) { // 3 or more in a diagonal
+                        for (let i = 0; i <= startRow - row; i++) {
+                            matches.push([row + i, col + i]);
+                        }
+                    }
+                }
+            }
+
+            // Check diagonal matches (top-left to bottom-right)
+            for (let row = rows - 1; row >= 2; row--) {
+                for (let col = 0; col < cols - 2; col++) {
+                    let startRow = row;
+                    let startCol = col;
+                    while (startRow > 0 && startCol < cols - 1 && board[startRow][startCol] && board[startRow][startCol] === board[startRow - 1][startCol + 1]) {
+                        startRow--;
+                        startCol++;
+                    }
+                    if (row - startRow >= 2) { // 3 or more in a diagonal
+                        for (let i = 0; i <= row - startRow; i++) {
+                            matches.push([row - i, col + i]);
+                        }
+                    }
+                }
+            }
+
             return matches;
         }
 
