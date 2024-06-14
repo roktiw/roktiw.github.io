@@ -109,6 +109,7 @@
         let score = 0;
         const scoreElement = document.getElementById('score');
         let isProcessing = false;
+        let rotationIndex = 0;
 
         function createBoard() {
             gameBoard.innerHTML = '';
@@ -159,10 +160,16 @@
 
         function rotateColumn() {
             if (isProcessing) return;
-            const temp = currentColumn[2];
-            currentColumn[2] = currentColumn[1];
-            currentColumn[1] = currentColumn[0];
-            currentColumn[0] = temp;
+            const permutations = [
+                [currentColumn[0], currentColumn[1], currentColumn[2]],
+                [currentColumn[0], currentColumn[2], currentColumn[1]],
+                [currentColumn[1], currentColumn[0], currentColumn[2]],
+                [currentColumn[1], currentColumn[2], currentColumn[0]],
+                [currentColumn[2], currentColumn[0], currentColumn[1]],
+                [currentColumn[2], currentColumn[1], currentColumn[0]],
+            ];
+            rotationIndex = (rotationIndex + 1) % permutations.length;
+            currentColumn = permutations[rotationIndex];
             board[currentPosition.x][currentPosition.y] = currentColumn[0];
             board[currentPosition.x + 1][currentPosition.y] = currentColumn[1];
             board[currentPosition.x + 2][currentPosition.y] = currentColumn[2];
