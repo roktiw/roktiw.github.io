@@ -3,30 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Columns v.240614-1545</title> <!-- Updated with the current timestamp -->
+    <title>Fruit Columns v.240614-1545</title>
     <style>
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
-            position: relative;
-            -webkit-touch-callout: none; /* Prevent callout to copy image, etc when tap to hold */
-            -webkit-user-select: none;   /* Prevent selection/copy of text, etc */
-            -webkit-tap-highlight-color: rgba(0,0,0,0); /* Remove tap highlight color */
-            touch-action: manipulation; /* Prevents zooming in on double-tap */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            touch-action: manipulation;
             font-family: 'Arial', sans-serif;
         }
-        #game-container {
+        #main-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+        #left-column, #right-column {
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            width: 20%;
+            padding: 10px;
+        }
+        #center-column {
+            display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 20px;
-            flex-grow: 1;
+            width: 60%;
+        }
+        #score-top, #next-element {
+            font-size: 20px;
         }
         #gameBoard {
             display: grid;
@@ -47,38 +59,13 @@
         }
         .disappear {
             opacity: 0;
-            background-color: #fff; /* Reset background color to white */
-        }
-        #lower-container {
-            display: flex;
-            width: 100%;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            position: absolute;
-            bottom: 20px;
-        }
-        #controls-left, #controls-right {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        #hud {
-            display: flex;
-            font-size: 20px;
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-        }
-        #hud p {
-            margin: 0;
-            line-height: 1.2;
+            background-color: #fff;
         }
         button {
             width: 60px;
             height: 60px;
             font-size: 24px;
-            touch-action: manipulation; /* Prevents zooming in on double-tap */
+            touch-action: manipulation;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -90,39 +77,41 @@
         button:active {
             background-color: #bbb;
         }
-        @media (max-height: 667px) {
-            #lower-container {
-                flex-direction: row;
-                align-items: flex-end;
-            }
-            #controls-left, #controls-right {
-                flex-direction: row;
-                gap: 10px;
-            }
-            #hud {
-                order: 1;
-                margin-bottom: 10px;
-            }
+        .top-container, .bottom-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .bottom-container {
+            gap: 10px;
         }
     </style>
 </head>
 <body>
-
-    <div id="game-container">
-        <div id="gameBoard"></div>
-    </div>
-
-    <div id="lower-container">
-        <div id="controls-left">
-            <button id="rotateButton">🔄</button>
-            <button id="leftButton">⬅️</button>
+    <div id="main-container">
+        <div id="left-column">
+            <div class="top-container">
+                <div id="score-top">Score: <span id="score-value-top">0</span></div>
+            </div>
+            <div class="bottom-container">
+                <button id="rotateButton">🔄</button>
+                <button id="leftButton">⬅️</button>
+            </div>
         </div>
-        <div id="hud">
-            <p>Score: <span id="score-value">0</span></p>
+        <div id="center-column">
+            <div id="gameBoard"></div>
         </div>
-        <div id="controls-right">
-            <button id="downButton">⬇️</button>
-            <button id="rightButton">➡️</button>
+        <div id="right-column">
+            <div class="top-container">
+                <div id="next-element">
+                    <p>Next:</p>
+                    <div id="next-emoji">🍎🍊🍌</div>
+                </div>
+            </div>
+            <div class="bottom-container">
+                <button id="rightButton">➡️</button>
+                <button id="downButton">⬇️</button>
+            </div>
         </div>
     </div>
 
@@ -177,6 +166,9 @@
             const now = new Date();
             const timestamp = `Fruit Columns v.${now.getFullYear().toString().slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
             document.title = timestamp;
+
+            // Set initial next element
+            updateNextElement();
         });
 
         const rows = 15;
@@ -187,7 +179,8 @@
         let currentPosition = { x: 0, y: 0 };
         let gameInterval;
         let score = 0;
-        const scoreElement = document.getElementById('score-value');
+        const scoreElementTop = document.getElementById('score-value-top');
+        const scoreElementBottom = document.getElementById('score-value-bottom');
         let isProcessing = false;
         let rotationIndex = 0;
 
@@ -208,7 +201,7 @@
                 for (let col = 0; col < cols; col++) {
                     const cell = document.getElementById(`cell-${row}-${col}`);
                     cell.textContent = board[row][col];
-                    cell.style.backgroundColor = board[row][col] ? '#fff' : '#333'; // Reset background color
+                    cell.style.backgroundColor = board[row][col] ? '#fff' : '#333';
                 }
             }
         }
@@ -229,6 +222,7 @@
                 board[2][currentPosition.y] = currentColumn[2];
             }
             updateBoard();
+            updateNextElement();
         }
 
         function getNewColumn() {
@@ -317,8 +311,8 @@
                         cell.classList.remove('disappear');
                     }
                     applyGravity();
-                    calculateScore(matches.length); // Calculate score based on the number of matches
-                }, 500); // Wait for the animation to complete (0.5s)
+                    calculateScore(matches.length);
+                }, 500);
             } else {
                 isProcessing = false;
                 dropNewColumn();
@@ -335,7 +329,7 @@
                     while (col < cols - 1 && board[row][col] && board[row][col] === board[row][col + 1]) {
                         col++;
                     }
-                    if (col - startCol >= 2) { // 3 or more in a row
+                    if (col - startCol >= 2) {
                         for (let i = startCol; i <= col; i++) {
                             matches.push([row, i]);
                         }
@@ -350,7 +344,7 @@
                     while (row < rows - 1 && board[row][col] && board[row][col] === board[row + 1][col]) {
                         row++;
                     }
-                    if (row - startRow >= 2) { // 3 or more in a column
+                    if (row - startRow >= 2) {
                         for (let i = startRow; i <= row; i++) {
                             matches.push([i, col]);
                         }
@@ -367,7 +361,7 @@
                         startRow++;
                         startCol++;
                     }
-                    if (startRow - row >= 2) { // 3 or more in a diagonal
+                    if (startRow - row >= 2) {
                         for (let i = 0; i <= startRow - row; i++) {
                             matches.push([row + i, col + i]);
                         }
@@ -384,7 +378,7 @@
                         startRow--;
                         startCol++;
                     }
-                    if (row - startRow >= 2) { // 3 or more in a diagonal
+                    if (row - startRow >= 2) {
                         for (let i = 0; i <= row - startRow; i++) {
                             matches.push([row - i, col + i]);
                         }
@@ -410,7 +404,7 @@
             updateBoard();
             setTimeout(() => {
                 clearMatchesOrNewColumn();
-            }, 100); // Short delay to ensure gravity completes before next check
+            }, 100);
         }
 
         function clearMatchesOrNewColumn() {
@@ -436,7 +430,13 @@
         }
 
         function updateScore() {
-            scoreElement.textContent = score;
+            scoreElementTop.textContent = score;
+        }
+
+        function updateNextElement() {
+            const nextElement = getNewColumn();
+            const nextEmoji = document.getElementById('next-emoji');
+            nextEmoji.textContent = nextElement.join('');
         }
 
         function startGame() {
