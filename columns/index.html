@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris-like Game</title>
+    <title>Fruit Columns v250614-1406</title>
     <style>
         body {
             display: flex;
@@ -46,7 +46,7 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: opacity 0.5s ease, background-color 0.5s ease;
+            transition: opacity 0.2s ease, background-color 0.2s ease;
         }
         .disappear {
             opacity: 0;
@@ -76,6 +76,7 @@
             border: none;
             border-radius: 10px;
             background-color: #ddd;
+            transition: background-color 0.1s ease;
         }
         button:active {
             background-color: #bbb;
@@ -89,12 +90,12 @@
     </div>
     <div id="controls">
         <div id="controls-left">
-            <button onclick="rotateColumn()">🔄</button>
-            <button onclick="moveLeft()">⬅️</button>
+            <button id="rotateButton">🔄</button>
+            <button id="leftButton">⬅️</button>
         </div>
         <div id="controls-right">
-            <button onclick="moveDown()">⬇️</button>
-            <button onclick="moveRight()">➡️</button>
+            <button id="downButton">⬇️</button>
+            <button id="rightButton">➡️</button>
         </div>
     </div>
     <script>
@@ -124,6 +125,24 @@
                         moveDown();
                         break;
                 }
+            });
+
+            // Add touch event listeners for mobile responsiveness
+            document.getElementById('rotateButton').addEventListener('touchstart', function(event) {
+                event.preventDefault();
+                rotateColumn();
+            });
+            document.getElementById('leftButton').addEventListener('touchstart', function(event) {
+                event.preventDefault();
+                moveLeft();
+            });
+            document.getElementById('rightButton').addEventListener('touchstart', function(event) {
+                event.preventDefault();
+                moveRight();
+            });
+            document.getElementById('downButton').addEventListener('touchstart', function(event) {
+                event.preventDefault();
+                moveDown();
             });
         });
 
