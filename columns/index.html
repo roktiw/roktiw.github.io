@@ -13,6 +13,19 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+            position: relative;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 20px;
+        }
+        #game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
         }
         #gameBoard {
             display: grid;
@@ -36,27 +49,38 @@
             background-color: #fff; /* Reset background color to white */
         }
         #controls {
-            margin-top: 20px;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: absolute;
+            bottom: 20px;
+        }
+        #controls-left, #controls-right {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         button {
-            margin: 5px;
             padding: 10px 20px;
             font-size: 16px;
-        }
-        #score {
-            margin-bottom: 20px;
-            font-size: 20px;
         }
     </style>
 </head>
 <body>
     <div id="score">Score: 0</div>
-    <div id="gameBoard"></div>
+    <div id="game-container">
+        <div id="gameBoard"></div>
+    </div>
     <div id="controls">
-        <button onclick="rotateColumn()">Rotate</button>
-        <button onclick="moveLeft()">Left</button>
-        <button onclick="moveRight()">Right</button>
-        <button onclick="moveDown()">Down</button>
+        <div id="controls-left">
+            <button onclick="rotateColumn()">Rotate</button>
+            <button onclick="moveLeft()">Left</button>
+        </div>
+        <div id="controls-right">
+            <button onclick="moveRight()">Right</button>
+            <button onclick="moveDown()">Down</button>
+        </div>
     </div>
     <script>
         const rows = 15;
@@ -111,7 +135,7 @@
         }
 
         function getNewColumn() {
-            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐'];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
             return [fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)]];
@@ -319,7 +343,7 @@
                 if (!isProcessing) {
                     moveDown();
                 }
-            }, 900);
+            }, 700);
         }
 
         startGame();
