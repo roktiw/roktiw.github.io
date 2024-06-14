@@ -14,6 +14,10 @@
             margin: 0;
             background-color: #f0f0f0;
             position: relative;
+            -webkit-touch-callout: none; /* Prevent callout to copy image, etc when tap to hold */
+            -webkit-user-select: none;   /* Prevent selection/copy of text, etc */
+            -webkit-tap-highlight-color: rgba(0,0,0,0); /* Remove tap highlight color */
+            touch-action: manipulation; /* Prevents zooming in on double-tap */
         }
         #score {
             position: absolute;
@@ -64,6 +68,7 @@
         button {
             padding: 10px 20px;
             font-size: 16px;
+            touch-action: manipulation; /* Prevents zooming in on double-tap */
         }
     </style>
 </head>
@@ -78,11 +83,22 @@
             <button onclick="moveLeft()">Left</button>
         </div>
         <div id="controls-right">
-            <button onclick="moveRight()">Right</button>
             <button onclick="moveDown()">Down</button>
+            <button onclick="moveRight()">Right</button>
         </div>
     </div>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = new Date().getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        });
+
         const rows = 15;
         const cols = 7;
         const gameBoard = document.getElementById('gameBoard');
@@ -135,7 +151,7 @@
         }
 
         function getNewColumn() {
-            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐'];
             return [fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)]];
@@ -343,7 +359,7 @@
                 if (!isProcessing) {
                     moveDown();
                 }
-            }, 700);
+            }, 900);
         }
 
         startGame();
