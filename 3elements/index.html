@@ -68,6 +68,7 @@
         let gameInterval;
         let score = 0;
         const scoreElement = document.getElementById('score');
+        let isProcessing = false;
 
         function createBoard() {
             gameBoard.innerHTML = '';
@@ -92,6 +93,7 @@
         }
 
         function dropNewColumn() {
+            if (isProcessing) return;
             currentColumn = getNewColumn();
             currentPosition = { x: 0, y: Math.floor(cols / 2) };
             if (board[0][currentPosition.y] !== null || board[1][currentPosition.y] !== null || board[2][currentPosition.y] !== null) {
@@ -109,13 +111,14 @@
         }
 
         function getNewColumn() {
-            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐'];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
             return [fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)]];
         }
 
         function rotateColumn() {
+            if (isProcessing) return;
             const temp = currentColumn[2];
             currentColumn[2] = currentColumn[1];
             currentColumn[1] = currentColumn[0];
@@ -127,6 +130,7 @@
         }
 
         function moveLeft() {
+            if (isProcessing) return;
             if (currentPosition.y > 0 && board[currentPosition.x][currentPosition.y - 1] === null && board[currentPosition.x + 1][currentPosition.y - 1] === null && board[currentPosition.x + 2][currentPosition.y - 1] === null) {
                 board[currentPosition.x][currentPosition.y] = null;
                 board[currentPosition.x + 1][currentPosition.y] = null;
@@ -140,6 +144,7 @@
         }
 
         function moveRight() {
+            if (isProcessing) return;
             if (currentPosition.y < cols - 1 && board[currentPosition.x][currentPosition.y + 1] === null && board[currentPosition.x + 1][currentPosition.y + 1] === null && board[currentPosition.x + 2][currentPosition.y + 1] === null) {
                 board[currentPosition.x][currentPosition.y] = null;
                 board[currentPosition.x + 1][currentPosition.y] = null;
@@ -153,6 +158,7 @@
         }
 
         function moveDown() {
+            if (isProcessing) return;
             if (currentPosition.x < rows - 3 && board[currentPosition.x + 3][currentPosition.y] === null) {
                 board[currentPosition.x][currentPosition.y] = null;
                 board[currentPosition.x + 1][currentPosition.y] = null;
@@ -168,6 +174,7 @@
         }
 
         function clearMatches() {
+            isProcessing = true;
             let matches = checkForMatches(board);
             if (matches.length > 0) {
                 for (let match of matches) {
@@ -185,6 +192,7 @@
                     applyGravity();
                 }, 500); // Wait for the animation to complete (0.5s)
             } else {
+                isProcessing = false;
                 dropNewColumn();
             }
         }
@@ -272,7 +280,9 @@
                 }
             }
             updateBoard();
-            clearMatchesOrNewColumn();
+            setTimeout(() => {
+                clearMatchesOrNewColumn();
+            }, 100); // Short delay to ensure gravity completes before next check
         }
 
         function clearMatchesOrNewColumn() {
@@ -280,6 +290,7 @@
             if (matches.length > 0) {
                 clearMatches();
             } else {
+                isProcessing = false;
                 dropNewColumn();
             }
         }
@@ -303,7 +314,11 @@
         function startGame() {
             createBoard();
             dropNewColumn();
-            gameInterval = setInterval(moveDown, 700);
+            gameInterval = setInterval(() => {
+                if (!isProcessing) {
+                    moveDown();
+                }
+            }, 700);
         }
 
         startGame();
