@@ -190,6 +190,7 @@
                         cell.classList.remove('disappear');
                     }
                     applyGravity();
+                    calculateScore(matches.length); // Calculate score based on the number of matches
                 }, 500); // Wait for the animation to complete (0.5s)
             } else {
                 isProcessing = false;
