@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris-like Game</title>
+    <title>Fruit Columns v.240614-1545</title> <!-- Updated with the current timestamp -->
     <style>
         body {
             display: flex;
@@ -18,11 +18,7 @@
             -webkit-user-select: none;   /* Prevent selection/copy of text, etc */
             -webkit-tap-highlight-color: rgba(0,0,0,0); /* Remove tap highlight color */
             touch-action: manipulation; /* Prevents zooming in on double-tap */
-        }
-        #score {
-            position: absolute;
-            bottom: 100px;
-            font-size: 20px;
+            font-family: 'Arial', sans-serif;
         }
         #game-container {
             display: flex;
@@ -51,7 +47,7 @@
             opacity: 0;
             background-color: #fff; /* Reset background color to white */
         }
-        #controls {
+        #lower-container {
             display: flex;
             width: 100%;
             justify-content: space-between;
@@ -63,6 +59,23 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+        #hud {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background-color: #ffcc00;
+            padding: 5px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 120px;
+        }
+        #hud p {
+            margin: 5px 0;
+            line-height: 1.2;
         }
         button {
             width: 60px;
@@ -86,11 +99,14 @@
     <div id="game-container">
         <div id="gameBoard"></div>
     </div>
-    <div id="score">Score: 0</div>
-    <div id="controls">
+    <div id="lower-container">
         <div id="controls-left">
             <button id="rotateButton">🔄</button>
             <button id="leftButton">⬅️</button>
+        </div>
+        <div id="hud">
+            <p>Score: <span id="score-value">0</span></p>
+            <p>Level: <span id="level-value">1</span></p>
         </div>
         <div id="controls-right">
             <button id="downButton">⬇️</button>
@@ -143,6 +159,11 @@
                 event.preventDefault();
                 moveDown();
             });
+
+            // Add the current timestamp to the title
+            const now = new Date();
+            const timestamp = `Fruit Columns v.${now.getFullYear().toString().slice(2)}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+            document.title = timestamp;
         });
 
         const rows = 15;
@@ -153,7 +174,9 @@
         let currentPosition = { x: 0, y: 0 };
         let gameInterval;
         let score = 0;
-        const scoreElement = document.getElementById('score');
+        let level = 1;
+        const scoreElement = document.getElementById('score-value');
+        const levelElement = document.getElementById('level-value');
         let isProcessing = false;
         let rotationIndex = 0;
 
@@ -188,7 +211,9 @@
                 clearInterval(gameInterval);
                 board = Array.from({ length: rows }, () => Array(cols).fill(null));
                 score = 0;
+                level = 1;
                 updateScore();
+                updateLevel();
             } else {
                 board[0][currentPosition.y] = currentColumn[0];
                 board[1][currentPosition.y] = currentColumn[1];
@@ -399,10 +424,19 @@
 
             score += basePoints + comboPoints;
             updateScore();
+
+            if (score >= level * 1000) {
+                level++;
+                updateLevel();
+            }
         }
 
         function updateScore() {
-            scoreElement.textContent = `Score: ${score}`;
+            scoreElement.textContent = score;
+        }
+
+        function updateLevel() {
+            levelElement.textContent = level;
         }
 
         function startGame() {
