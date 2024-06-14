@@ -9,7 +9,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
@@ -25,6 +25,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 20px;
+            margin-top: 20px;
         }
         #gameBoard {
             display: grid;
@@ -62,16 +63,9 @@
         }
         #hud {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             font-size: 20px;
-            background-color: #ffcc00;
-            padding: 5px 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
-            width: 120px;
+            align-items: flex-end;
         }
         #hud p {
             margin: 5px 0;
@@ -106,7 +100,6 @@
         </div>
         <div id="hud">
             <p>Score: <span id="score-value">0</span></p>
-            <p>Level: <span id="level-value">1</span></p>
         </div>
         <div id="controls-right">
             <button id="downButton">⬇️</button>
@@ -174,9 +167,7 @@
         let currentPosition = { x: 0, y: 0 };
         let gameInterval;
         let score = 0;
-        let level = 1;
         const scoreElement = document.getElementById('score-value');
-        const levelElement = document.getElementById('level-value');
         let isProcessing = false;
         let rotationIndex = 0;
 
@@ -211,9 +202,7 @@
                 clearInterval(gameInterval);
                 board = Array.from({ length: rows }, () => Array(cols).fill(null));
                 score = 0;
-                level = 1;
                 updateScore();
-                updateLevel();
             } else {
                 board[0][currentPosition.y] = currentColumn[0];
                 board[1][currentPosition.y] = currentColumn[1];
@@ -424,19 +413,10 @@
 
             score += basePoints + comboPoints;
             updateScore();
-
-            if (score >= level * 1000) {
-                level++;
-                updateLevel();
-            }
         }
 
         function updateScore() {
             scoreElement.textContent = score;
-        }
-
-        function updateLevel() {
-            levelElement.textContent = level;
         }
 
         function startGame() {
