@@ -109,7 +109,7 @@
         }
 
         function getNewColumn() {
-            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐'];
             return [fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)]];
@@ -183,8 +183,6 @@
                         cell.classList.remove('disappear');
                     }
                     applyGravity();
-                    calculateScore(matches.length);
-                    dropNewColumn();
                 }, 500); // Wait for the animation to complete (0.5s)
             } else {
                 dropNewColumn();
@@ -274,6 +272,16 @@
                 }
             }
             updateBoard();
+            clearMatchesOrNewColumn();
+        }
+
+        function clearMatchesOrNewColumn() {
+            let matches = checkForMatches(board);
+            if (matches.length > 0) {
+                clearMatches();
+            } else {
+                dropNewColumn();
+            }
         }
 
         function calculateScore(matchesCount) {
