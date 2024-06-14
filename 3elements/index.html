@@ -43,9 +43,14 @@
             padding: 10px 20px;
             font-size: 16px;
         }
+        #score {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
+    <div id="score">Score: 0</div>
     <div id="gameBoard"></div>
     <div id="controls">
         <button onclick="rotateColumn()">Rotate</button>
@@ -61,6 +66,8 @@
         let currentColumn = [];
         let currentPosition = { x: 0, y: 0 };
         let gameInterval;
+        let score = 0;
+        const scoreElement = document.getElementById('score');
 
         function createBoard() {
             gameBoard.innerHTML = '';
@@ -91,6 +98,8 @@
                 alert('Game Over!');
                 clearInterval(gameInterval);
                 board = Array.from({ length: rows }, () => Array(cols).fill(null));
+                score = 0;
+                updateScore();
             } else {
                 board[0][currentPosition.y] = currentColumn[0];
                 board[1][currentPosition.y] = currentColumn[1];
@@ -174,6 +183,7 @@
                         cell.classList.remove('disappear');
                     }
                     applyGravity();
+                    calculateScore(matches.length);
                     dropNewColumn();
                 }, 500); // Wait for the animation to complete (0.5s)
             } else {
@@ -230,6 +240,22 @@
                 }
             }
             updateBoard();
+        }
+
+        function calculateScore(matchesCount) {
+            let basePoints = 100;
+            let comboPoints = 0;
+
+            if (matchesCount > 3) {
+                comboPoints = basePoints * Math.pow(2, matchesCount - 3);
+            }
+
+            score += basePoints + comboPoints;
+            updateScore();
+        }
+
+        function updateScore() {
+            scoreElement.textContent = `Score: ${score}`;
         }
 
         function startGame() {
