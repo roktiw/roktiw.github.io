@@ -16,8 +16,8 @@
         }
         #gameBoard {
             display: grid;
-            grid-template-columns: repeat(10, 30px);
-            grid-template-rows: repeat(20, 30px);
+            grid-template-columns: repeat(7, 30px);
+            grid-template-rows: repeat(15, 30px);
             gap: 1px;
             background-color: #333;
         }
@@ -59,8 +59,8 @@
         <button onclick="moveDown()">Down</button>
     </div>
     <script>
-        const rows = 20;
-        const cols = 10;
+        const rows = 15;
+        const cols = 7;
         const gameBoard = document.getElementById('gameBoard');
         let board = Array.from({ length: rows }, () => Array(cols).fill(null));
         let currentColumn = [];
