@@ -89,14 +89,12 @@
     </div>
     <div id="controls">
         <div id="controls-left">
+            <button onclick="rotateColumn()">🔄</button>
             <button onclick="moveLeft()">⬅️</button>
-            <button onclick="moveRight()">➡️</button>
         </div>
         <div id="controls-right">
-            <button onclick="rotateColumn()">🔄</button>
             <button onclick="moveDown()">⬇️</button>
-
-
+            <button onclick="moveRight()">➡️</button>
         </div>
     </div>
     <script>
@@ -109,6 +107,24 @@
                 }
                 lastTouchEnd = now;
             }, false);
+
+            // Add event listener for keyboard controls
+            document.addEventListener('keydown', function(event) {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        rotateColumn();
+                        break;
+                    case 'ArrowLeft':
+                        moveLeft();
+                        break;
+                    case 'ArrowRight':
+                        moveRight();
+                        break;
+                    case 'ArrowDown':
+                        moveDown();
+                        break;
+                }
+            });
         });
 
         const rows = 15;
