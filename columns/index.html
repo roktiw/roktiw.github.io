@@ -111,7 +111,7 @@
         }
 
         function getNewColumn() {
-            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐', '🍆'];
+            const fruits = ['🍎', '🍊', '🍌', '🥝', '🫐'];
             return [fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)],
                     fruits[Math.floor(Math.random() * fruits.length)]];
@@ -319,7 +319,7 @@
                 if (!isProcessing) {
                     moveDown();
                 }
-            }, 700);
+            }, 900);
         }
 
         startGame();
