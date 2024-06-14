@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Columns v250614-1406</title>
+    <title>Tetris-like Game</title>
     <style>
         body {
             display: flex;
@@ -21,8 +21,7 @@
         }
         #score {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            bottom: 100px;
             font-size: 20px;
         }
         #game-container {
@@ -84,18 +83,18 @@
     </style>
 </head>
 <body>
-    <div id="score">Score: 0</div>
     <div id="game-container">
         <div id="gameBoard"></div>
     </div>
+    <div id="score">Score: 0</div>
     <div id="controls">
         <div id="controls-left">
+            <button id="rotateButton">🔄</button>
             <button id="leftButton">⬅️</button>
-            <button id="rightButton">➡️</button>
         </div>
         <div id="controls-right">
-            <button id="rotateButton">🔄</button>
             <button id="downButton">⬇️</button>
+            <button id="rightButton">➡️</button>
         </div>
     </div>
     <script>
