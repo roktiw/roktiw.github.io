@@ -26,6 +26,11 @@ jobs:
       run: |
         mkdir -p blog
 
+    - name: Debug: List Markdown files
+      run: |
+        echo "Listing Markdown files in blog directory:"
+        find blog -type f -name "*.md"
+
     - name: Convert Markdown to HTML
       run: |
         shopt -s nullglob
@@ -35,6 +40,10 @@ jobs:
           exit 0
         fi
         for file in "${files[@]}"; do
+          if [ ! -s "$file" ]; then
+            echo "Skipping empty file: $file"
+            continue
+          fi
           html_file="${file%.md}.html"
           markdown-it "$file" > "$html_file"
         done
