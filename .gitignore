@@ -1,0 +1,12 @@
+# macOS system files
+.DS_Store
+
+# Backup and temporary files
+*.tmp
+*.bak
+
+# Node.js dependencies (if applicable)
+node_modules/
+
+# Compiled files
+*.js.map
