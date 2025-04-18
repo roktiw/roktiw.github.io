@@ -3,7 +3,7 @@ name: Convert Markdown to HTML
 on:
   push:
     paths:
-      - 'blog/**/*.md'
+      - '**/*.md'
 
 jobs:
   convert:
