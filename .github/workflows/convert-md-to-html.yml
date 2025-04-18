@@ -22,17 +22,32 @@ jobs:
       run: |
         npm install -g markdown-it-cli
 
+    - name: Ensure blog directory exists
+      run: |
+        mkdir -p blog
+
     - name: Convert Markdown to HTML
       run: |
-        for file in blog/**/*.md; do
+        shopt -s nullglob
+        files=(blog/**/*.md)
+        if [ ${#files[@]} -eq 0 ]; then
+          echo "No Markdown files found to process."
+          exit 0
+        fi
+        for file in "${files[@]}"; do
           html_file="${file%.md}.html"
           markdown-it "$file" > "$html_file"
         done
+        shopt -u nullglob
 
     - name: Commit converted HTML files
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add blog/**/*.html
-        git commit -m "Convert Markdown to HTML [GitHub Actions]"
-        git push
+        if ls blog/**/*.html 1> /dev/null 2>&1; then
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add blog/**/*.html
+          git commit -m "Convert Markdown to HTML [GitHub Actions]"
+          git push
+        else
+          echo "No HTML files to commit."
+        fi
