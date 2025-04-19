@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - 'posts/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   convert:
@@ -22,27 +26,13 @@ jobs:
       run: |
         npm install -g markdown-it-cli
 
-    - name: Ensure output directory exists
-      run: |
-        mkdir -p output
-
     - name: Convert Markdown to HTML
       run: |
-        shopt -s nullglob
-        files=(posts/**/*.md)
-        if [ ${#files[@]} -eq 0 ]; then
-          echo "No Markdown files found to process."
-          exit 0
-        fi
-        for file in "${files[@]}"; do
-          if [ ! -s "$file" ]; then
-            echo "Skipping empty file: $file"
-            continue
-          fi
+        mkdir -p output
+        for file in posts/*.md; do
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"
         done
-        shopt -u nullglob
 
     - name: Commit converted HTML files
       run: |
