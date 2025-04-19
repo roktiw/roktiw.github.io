@@ -31,16 +31,16 @@ jobs:
         sudo apt-get install -y pandoc
       # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
-    - name: Convert Markdown to HTML
+    - name: Convert Markdown Files in /input to HTML
       run: |
         mkdir -p output
-        for file in posts/*.md; do
+        for file in $(find input -name '*.md'); do
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"
         done
-      # Converts all Markdown files in the 'posts' directory to HTML and saves them in the 'output' folder.
+      # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
 
-    - name: Generate New Index.html with Menu
+    - name: Generate New Index.html with All Links
       run: |
         echo "<!DOCTYPE html>" > index.html
         echo "<html>" >> index.html
@@ -49,20 +49,16 @@ jobs:
         echo "<h1>Index of HTML Files</h1>" >> index.html
         echo "<ul>" >> index.html
 
-        # Read menu order from config.yaml
-        menu_order=$(yq eval '.menuOrder[]' config/config.yaml)
-
-        # Generate menu based on input folder structure and config.yaml order
-        for folder in $menu_order; do
-          if [ -d "input/$folder" ]; then
-            echo "<li><a href='output/$folder.html'>$folder</a></li>" >> index.html
-          fi
+        # Generate links for all HTML files in the output directory
+        for file in $(find output -name '*.html'); do
+          filename=$(basename "$file")
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
         done
 
         echo "</ul>" >> index.html
         echo "</body>" >> index.html
         echo "</html>" >> index.html
-      # Dynamically generates an index.html file with links to folders specified in config.yaml.
+      # Dynamically generates an index.html file with links to all HTML files in the output directory.
 
     - name: Commit and Push Changes
       run: |
