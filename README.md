@@ -44,7 +44,6 @@ No coding skills needed. No complicated setup. Just write, push, and publish!
       - [Step 5: See Your Website Online](#step-5-see-your-website-online-1)
       - [Extra: Useful VS Code Extensions](#extra-useful-vs-code-extensions)
   - [🙌 Contributing](#-contributing)
-  - [📝 TODO List](#-todo-list)
 
 ---
 
@@ -227,27 +226,6 @@ This is my first post using GAMstack.
 ## 🙌 Contributing
 
 Pull requests are welcome—if they make things simpler.
-
----
-
-## 📝 TODO List
-
-- [ ] 3 repos: mini (core), stable, -dev
-- [ ] Ensure error handling for invalid Markdown syntax or missing files in the Markdown-to-HTML conversion script.
-- [ ] Add a script or GitHub Action to clean the `output/` folder before generating new files.
-- [ ] Include a test suite to verify Markdown-to-HTML conversion.
-- [ ] Add a troubleshooting section to the `README.md` file.
-- [ ] Include instructions for customizing generated HTML files (e.g., styles or scripts).
-- [ ] Add a default CSS file for styling the generated HTML files.
-- [ ] Consider adding localization support for multiple languages.
-- [ ] Add versioning to the project using Git tags.
-- [ ] List external tools or libraries used for Markdown conversion in the `README.md` file.
-- [ ] Add /scripts/ for bash script that will read folder structure in input for Menu on main website
-- [ ] Add /config/ for CSS and HTML templates and config.json with i.e. page title
-- [ ] Publish your website from your phone using native GitHub app
-- [ ] Keep all workflow logic in a single file for now due to issues with committing to GitHub.
-- [ ] Revisit splitting workflows into reusable components or separate files once the GitHub commit issue is resolved.
-- [ ] Add change tracking to avoid rebuilding everything unnecessarily in the future. For now, this is skipped to simplify development.
 
 ---
 
