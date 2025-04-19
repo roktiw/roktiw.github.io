@@ -1,0 +1,16 @@
+<h2>How the GAM Stack Works in This Project</h2>
+<p>In this project, the GAM Stack operates as follows:</p>
+<p><strong>Backend</strong>:</p>
+<ul>
+<li>This project does not include a traditional backend (e.g., Node.js server). It appears to be a fully static site, meaning all content is served directly as static files.</li>
+</ul>
+<p><strong>DevOps</strong>:</p>
+<ul>
+<li>GitHub Actions is used to automate updates to the <code>index.html</code> file. The workflow defined in <code>.github/workflows/update-index.yml</code> triggers a script (<code>update-index.js</code>) that scans the <code>posts/</code> directory for new Markdown files and appends them as links to the main <code>index.html</code> file.</li>
+<li>The project is likely hosted on GitHub Pages, making it accessible as a static website.</li>
+</ul>
+<p><strong>Content and Structure</strong>:</p>
+<ul>
+<li>The <code>posts/</code> folder contains Markdown files (<code>.md</code>) that serve as content for the site, such as documentation or blog posts. These files are dynamically linked in the main <code>index.html</code>.</li>
+</ul>
+<p>In summary, this project is a static website with automated content updates powered by GitHub Actions. It organizes content into separate projects and posts, making it modular and easy to maintain.</p>
