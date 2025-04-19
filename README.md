@@ -247,6 +247,7 @@ Pull requests are welcome—if they make things simpler.
 - [ ] Publish your website from your phone using native GitHub app
 - [ ] Keep all workflow logic in a single file for now due to issues with committing to GitHub.
 - [ ] Revisit splitting workflows into reusable components or separate files once the GitHub commit issue is resolved.
+- [ ] Add change tracking to avoid rebuilding everything unnecessarily in the future. For now, this is skipped to simplify development.
 
 ---
 

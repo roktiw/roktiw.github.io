@@ -51,6 +51,15 @@ jobs:
         echo "<html>" >> index.html
         echo "<head><title>Index of HTML Files</title></head>" >> index.html
         echo "<body>" >> index.html
+
+        # Add top menu with links to all HTML files
+        echo "<nav><ul>" >> index.html
+        for file in $(find output -name '*.html'); do
+          filename=$(basename "$file")
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
+        done
+        echo "</ul></nav>" >> index.html
+
         echo "<h1>Index of HTML Files</h1>" >> index.html
         echo "<ul>" >> index.html
 
