@@ -10,23 +10,26 @@ permissions:
   contents: write
 
 jobs:
-  convert-and-generate:
+  gamstack-main:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      # Checks out the repository to the runner, allowing access to the codebase.
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
+      # Ssets up Node.js version 16, required for running JavaScript-based tools.
 
     - name: Install markdown-to-html converter and Pandoc
       run: |
         npm install -g markdown-it-cli
         sudo apt-get update
         sudo apt-get install -y pandoc
+      # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
     - name: Convert Markdown to HTML
       run: |
@@ -35,6 +38,7 @@ jobs:
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"
         done
+      # Converts all Markdown files in the 'posts' directory to HTML and saves them in the 'output' folder.
 
     - name: Generate New Index.html with Menu
       run: |
@@ -45,10 +49,10 @@ jobs:
         echo "<h1>Index of HTML Files</h1>" >> index.html
         echo "<ul>" >> index.html
 
-        # Read menu order from config.json
-        menu_order=$(jq -r '.menuOrder[]' config/config.json)
+        # Read menu order from config.yaml
+        menu_order=$(yq eval '.menuOrder[]' config/config.yaml)
 
-        # Generate menu based on input folder structure and config.json order
+        # Generate menu based on input folder structure and config.yaml order
         for folder in $menu_order; do
           if [ -d "input/$folder" ]; then
             echo "<li><a href='output/$folder.html'>$folder</a></li>" >> index.html
@@ -58,6 +62,7 @@ jobs:
         echo "</ul>" >> index.html
         echo "</body>" >> index.html
         echo "</html>" >> index.html
+      # Dynamically generates an index.html file with links to folders specified in config.yaml.
 
     - name: Commit and Push Changes
       run: |

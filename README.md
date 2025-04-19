@@ -246,6 +246,8 @@ Pull requests are welcome—if they make things simpler.
 - [ ] Add /scripts/ for bash script that will read folder structure in input for Menu on main website
 - [ ] Add /config/ for CSS and HTML templates and config.json with i.e. page title
 - [ ] Publish your website from your phone using native GitHub app
+- [ ] Keep all workflow logic in a single file for now due to issues with committing to GitHub.
+- [ ] Revisit splitting workflows into reusable components or separate files once the GitHub commit issue is resolved.
 
 ---
 
