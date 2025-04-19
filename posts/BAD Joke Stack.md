@@ -6,3 +6,6 @@ Because light attracts bugs!
 
 Because they can't C#!
 
+# Why do Python programmers prefer snakes as pets?
+
+Because they love debugging with constrictors!

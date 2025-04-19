@@ -1,0 +1,49 @@
+name: Generate HTML Links and Update Index
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  generate-links:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Convert Markdown to HTML
+      run: |
+        mkdir -p output
+        for file in posts/*.md; do
+          filename=$(basename "$file" .md)
+          pandoc "$file" -o "output/$filename.html"
+        done
+
+    - name: Generate HTML Links
+      run: |
+        echo "<ul>" > output/links.html
+        for file in output/*.html; do
+          filename=$(basename "$file")
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> output/links.html
+        done
+        echo "</ul>" >> output/links.html
+
+    - name: Update Main Index.html
+      run: |
+        links=$(cat output/links.html)
+        sed -i '/<!-- Links Start -->/,/<!-- Links End -->/c\<!-- Links Start -->\n$links\n<!-- Links End -->' index.html
+
+    - name: Commit and Push Changes
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add index.html output/*.html
+        git commit -m "Update index.html with links to output HTML files"
+        git push

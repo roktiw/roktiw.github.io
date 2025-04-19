@@ -55,5 +55,4 @@ The GAM GitHub Actions Markdown (GAM) Stack is a lightweight and automated solut
 ## Contributing
 Contributions are welcome! Please follow the standard GitHub workflow for submitting pull requests.
 
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Copyright Wiktor Świtkowski 2025
