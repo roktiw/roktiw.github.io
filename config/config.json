@@ -1,0 +1,9 @@
+{
+  "menuOrder": [
+    "blog",
+    "about-me",
+    "projects"
+  ],
+  "headTitle": "gamstack | Github Actions + Markdown = Static Site",
+  "h1": "Welcome to My Gamstack Website"
+}
