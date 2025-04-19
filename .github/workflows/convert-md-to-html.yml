@@ -1,4 +1,4 @@
-name: Convert Markdown to HTML
+name: Convert Markdown to HTML and Generate Index
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 jobs:
-  convert:
+  convert-and-generate:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,9 +22,11 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install markdown-to-html converter
+    - name: Install markdown-to-html converter and Pandoc
       run: |
         npm install -g markdown-it-cli
+        sudo apt-get update
+        sudo apt-get install -y pandoc
 
     - name: Convert Markdown to HTML
       run: |
@@ -34,13 +36,29 @@ jobs:
           markdown-it "$file" > "$output_file"
         done
 
-    - name: Commit converted HTML files
+    - name: Generate New Index.html
+      run: |
+        echo "<!DOCTYPE html>" > index.html
+        echo "<html>" >> index.html
+        echo "<head><title>Index of HTML Files</title></head>" >> index.html
+        echo "<body>" >> index.html
+        echo "<h1>Index of HTML Files</h1>" >> index.html
+        echo "<ul>" >> index.html
+        for file in output/*.html; do
+          filename=$(basename "$file")
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
+        done
+        echo "</ul>" >> index.html
+        echo "</body>" >> index.html
+        echo "</html>" >> index.html
+
+    - name: Commit and Push Changes
       run: |
         if ls output/*.html 1> /dev/null 2>&1; then
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/*.html
-          git commit -m "Convert Markdown to HTML [GitHub Actions]"
+          git add index.html output/*.html
+          git commit -m "Convert Markdown to HTML and Generate Index [GitHub Actions]"
           git push
         else
           echo "No HTML files to commit."
