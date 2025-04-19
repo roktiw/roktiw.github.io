@@ -31,9 +31,14 @@ jobs:
         sudo apt-get install -y pandoc
       # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
+    - name: Clean Output Directory
+      run: |
+        rm -rf output/*
+        mkdir -p output
+      # Cleans the 'output' directory to ensure it is rebuilt from scratch based on the 'input' folder structure.
+
     - name: Convert Markdown Files in /input to HTML
       run: |
-        mkdir -p output
         for file in $(find input -name '*.md'); do
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"

@@ -236,7 +236,6 @@ Pull requests are welcome—if they make things simpler.
 - [ ] Ensure error handling for invalid Markdown syntax or missing files in the Markdown-to-HTML conversion script.
 - [ ] Add a script or GitHub Action to clean the `output/` folder before generating new files.
 - [ ] Include a test suite to verify Markdown-to-HTML conversion.
-- [ ] Dynamically generate `index.html` to list all converted HTML files in the `output/` folder.
 - [ ] Add a troubleshooting section to the `README.md` file.
 - [ ] Include instructions for customizing generated HTML files (e.g., styles or scripts).
 - [ ] Add a default CSS file for styling the generated HTML files.
