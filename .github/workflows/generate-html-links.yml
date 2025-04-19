@@ -31,24 +31,28 @@ jobs:
           pandoc "$file" -o "output/$filename.html"
         done
 
-    - name: Generate HTML Links
+    - name: Generate New Index.html
       run: |
-        echo "<ul>" > output/links.html
+        echo "<!DOCTYPE html>" > index.html
+        echo "<html>" >> index.html
+        echo "<head><title>Index of HTML Files</title></head>" >> index.html
+        echo "<body>" >> index.html
+        echo "<h1>Index of HTML Files</h1>" >> index.html
+        echo "<ul>" >> index.html
         for file in output/*.html; do
           filename=$(basename "$file")
-          echo "<li><a href='output/$filename'>$filename</a></li>" >> output/links.html
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
         done
-        echo "</ul>" >> output/links.html
-
-    - name: Update Main Index.html
-      run: |
-        links=$(cat output/links.html)
-        sed -i '/<!-- Links Start -->/,/<!-- Links End -->/c\<!-- Links Start -->\n$links\n<!-- Links End -->' index.html
+        echo "</ul>" >> index.html
+        echo "</body>" >> index.html
+        echo "</html>" >> index.html
 
     - name: Commit and Push Changes
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
         git add index.html output/*.html
-        git commit -m "Update index.html with links to output HTML files"
-        git push
+        git commit -m "Recreate index.html with links to output HTML files"
+        git push https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git HEAD:main
