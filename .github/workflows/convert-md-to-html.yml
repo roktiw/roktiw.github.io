@@ -36,7 +36,7 @@ jobs:
           markdown-it "$file" > "$output_file"
         done
 
-    - name: Generate New Index.html
+    - name: Generate New Index.html with Menu
       run: |
         echo "<!DOCTYPE html>" > index.html
         echo "<html>" >> index.html
@@ -44,10 +44,17 @@ jobs:
         echo "<body>" >> index.html
         echo "<h1>Index of HTML Files</h1>" >> index.html
         echo "<ul>" >> index.html
-        for file in output/*.html; do
-          filename=$(basename "$file")
-          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
+
+        # Read menu order from config.json
+        menu_order=$(jq -r '.menuOrder[]' config/config.json)
+
+        # Generate menu based on input folder structure and config.json order
+        for folder in $menu_order; do
+          if [ -d "input/$folder" ]; then
+            echo "<li><a href='output/$folder.html'>$folder</a></li>" >> index.html
+          fi
         done
+
         echo "</ul>" >> index.html
         echo "</body>" >> index.html
         echo "</html>" >> index.html
