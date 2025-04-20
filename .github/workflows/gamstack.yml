@@ -1,5 +1,4 @@
-name: Build and Deploy to GitHub Pages
-
+name: gamstack worker
 on:
   push:
     branches:
@@ -42,9 +41,15 @@ jobs:
           markdown-it "$file" > "$output_file"
         done
 
-    - name: Generate Dynamic Menu
+    - name: Generate Menu
       run: |
         bash scripts/generate_menu.sh
+      # Ensures the `menu.html` file is generated before combining templates.
+
+    - name: Generate Homepage
+      run: |
+        bash scripts/generate_menu.sh
+      # Ensures the homepage is generated from the `homepage.md` template in the `input/` directory.
 
     - name: Combine Templates into Index.html
       run: |
