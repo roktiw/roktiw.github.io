@@ -1,39 +1,41 @@
 #!/bin/bash
 
-# Script to dynamically generate a menu based on the input folder structure
-INPUT_DIR="../input"
-OUTPUT_FILE="../templates/menu.html"
+# Function to read JSON config using jq
+get_config() {
+    jq -r "$1" config/site.json
+}
 
-# Check if a homepage template exists
-HOMEPAGE_TEMPLATE="../input/homepage.md"
-HOMEPAGE_OUTPUT="../output/index.html"
+# Create menu HTML
+echo "<nav class=\"site-nav\">" > templates/menu.html
+echo "  <ul>" >> templates/menu.html
 
-if [ -f "$HOMEPAGE_TEMPLATE" ]; then
-  echo "Processing homepage template: $HOMEPAGE_TEMPLATE"
-  markdown-it "$HOMEPAGE_TEMPLATE" > "$HOMEPAGE_OUTPUT"
-  echo "Homepage generated at: $HOMEPAGE_OUTPUT"
-else
-  echo "No homepage template found at $HOMEPAGE_TEMPLATE. Skipping homepage generation."
+# Add home link if configured
+if [ "$(get_config '.menu.home.show')" = "true" ]; then
+    home_title=$(get_config '.menu.home.title // "Home"')
+    echo "    <li><a href=\"/\">$home_title</a></li>" >> templates/menu.html
 fi
 
-# Ensure the output directory exists
-mkdir -p ../templates
+# Get ordered menu items
+menu_order=$(get_config '.menu.order[]' | tr '\n' ' ')
 
-# Start the menu HTML
-echo "<ul>" > ../templates/menu.html
+# If no order specified, use directory listing
+if [ -z "$menu_order" ]; then
+    menu_order=$(ls input/ | grep -v 'homepage.md' | tr '\n' ' ')
+fi
 
-# Recursively find all Markdown files and generate menu items
-find "$INPUT_DIR" -type f -name '*.md' | while read -r file; do
-  # Extract relative path and filename without extension
-  relative_path="${file#$INPUT_DIR/}"
-  filename="$(basename "$relative_path" .md)"
-
-  # Convert to a valid HTML link
-  echo "  <li><a href='output/${filename}.html'>${filename}</a></li>" >> ../templates/menu.html
+# Process each menu item
+for item in $menu_order; do
+    # Skip if in hide list
+    if echo "$(get_config '.menu.hide[]')" | grep -q "^$item$"; then
+        continue
+    fi
+    
+    # Get custom title or use directory name
+    title=$(get_config ".menu.titles[\"$item\"] // \"$item\"")
+    
+    # Add menu item
+    echo "    <li><a href=\"/$item/\">$title</a></li>" >> templates/menu.html
 done
 
-# End the menu HTML
-echo "</ul>" >> ../templates/menu.html
-
-# Notify completion
-echo "Menu generated at ../templates/menu.html"
+echo "  </ul>" >> templates/menu.html
+echo "</nav>" >> templates/menu.html

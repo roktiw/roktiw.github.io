@@ -1,4 +1,4 @@
-name: gamstack worker
+name: GAMstack Build & Deploy
 on:
   push:
     branches:
@@ -23,53 +23,59 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install markdown-to-html converter and Pandoc
+    - name: Install dependencies
       run: |
-        npm install -g markdown-it-cli
         sudo apt-get update
-        sudo apt-get install -y pandoc
+        sudo apt-get install -y pandoc jq
+        npm install -g markdown-it-cli
 
-    - name: Clean Output Directory
+    - name: Clean output directory
       run: |
         rm -rf output/*
         mkdir -p output
 
-    - name: Convert Markdown Files in /input to HTML
+    - name: Make scripts executable
       run: |
-        for file in $(find input -name '*.md'); do
-          output_file="output/$(basename \"${file%.md}.html\")"
-          markdown-it "$file" > "$output_file"
+        chmod +x scripts/*.sh
+
+    - name: Process content
+      run: |
+        ./scripts/process_content.sh
+
+    - name: Generate menu
+      run: |
+        ./scripts/generate_menu.sh
+
+    - name: Copy static files
+      run: |
+        # Copy files specified in config
+        jq -r '.build.copy_files[]' config/site.json | while read file; do
+          cp "$file" output/ 2>/dev/null || true
         done
+        
+        # Copy styles
+        mkdir -p output/styles
+        cp templates/styles/* output/styles/ 2>/dev/null || true
 
-    - name: Generate Menu
+    - name: Minify if configured
       run: |
-        bash scripts/generate_menu.sh
-      # Ensures the `menu.html` file is generated before combining templates.
-
-    - name: Generate Homepage
-      run: |
-        bash scripts/generate_menu.sh
-      # Ensures the homepage is generated from the `homepage.md` template in the `input/` directory.
-
-    - name: Combine Templates into Index.html
-      run: |
-        cat templates/header.html templates/menu.html templates/footer.html > index.html
+        if [ "$(jq -r '.build.minify' config/site.json)" = "true" ]; then
+          npm install -g html-minifier
+          find output -name "*.html" -exec html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o {} {} \;
+        fi
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
     - name: Setup Pages
       uses: actions/configure-pages@v5
 
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
-        path: '.'
+        path: 'output'
 
     - name: Deploy to GitHub Pages
       id: deployment

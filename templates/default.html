@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>$if(title)$$title$$else$$site.title$$endif$ - $site.title$</title>
+    
+    <meta name="description" content="$if(description)$$description$$else$$site.description$$endif$">
+    <meta name="author" content="$site.author$">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="$if(title)$$title$$else$$site.title$$endif$">
+    <meta property="og:description" content="$if(description)$$description$$else$$site.description$$endif$">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/custom.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a href="/">$site.title$</a></h1>
+            $partial("templates/menu.html")$
+        </div>
+    </header>
+
+    <main class="container">
+        $if(is_section)$
+        <article class="section-content">
+            $body$
+            
+            $if(section_files)$
+            <section class="section-listing">
+                <h2>Contents</h2>
+                <ul>
+                    $for(section_files)$
+                    <li><a href="$it.url$">$it.title$</a></li>
+                    $endfor$
+                </ul>
+            </section>
+            $endif$
+        </article>
+        $else$
+        <article class="post-content">
+            $body$
+        </article>
+        $endif$
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; $site.author$ $year$ - Built with GAMstack</p>
+            $if(site.social)$
+            <div class="social-links">
+                $if(site.social.github)$
+                <a href="https://github.com/$site.social.github$">GitHub</a>
+                $endif$
+                $if(site.social.twitter)$
+                <a href="https://twitter.com/$site.social.twitter$">Twitter</a>
+                $endif$
+            </div>
+            $endif$
+        </div>
+    </footer>
+</body>
+</html> 

@@ -1,0 +1,29 @@
+{
+    "site": {
+        "title": "My GAMstack Site",
+        "description": "Personal website built with GAMstack",
+        "author": "Your Name",
+        "social": {
+            "twitter": "@username",
+            "github": "username"
+        }
+    },
+    "menu": {
+        "order": ["blog", "projects", "about-me"],
+        "titles": {
+            "blog": "My Blog",
+            "projects": "Portfolio",
+            "about-me": "About"
+        },
+        "hide": ["private", "drafts"],
+        "home": {
+            "title": "Home",
+            "show": true
+        }
+    },
+    "build": {
+        "exclude_patterns": ["*.draft.md", "README.md"],
+        "copy_files": ["CNAME", "robots.txt"],
+        "minify": true
+    }
+} 
