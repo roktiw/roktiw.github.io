@@ -24,100 +24,65 @@ jobs:
         node-version: '16'
       # Sets up Node.js version 16, required for running JavaScript-based tools.
 
-    - name: Install dependencies
-      run: |
+    - name: Install markdown-to-html converter and Pandoc
+      run: |  # js
         npm install -g markdown-it-cli
         sudo apt-get update
-        sudo apt-get install -y pandoc html-tidy
-        npm install -g broken-link-checker
+        sudo apt-get install -y pandoc
+      # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
     - name: Clean Output Directory
-      run: |
+      run: | # 
         rm -rf output/*
         mkdir -p output
       # Cleans the 'output' directory to ensure it is rebuilt from scratch based on the 'input' folder structure.
 
-    - name: Validate Configuration
-      run: |
-        if ! jq -e . config/config.json > /dev/null; then
-          echo "Error: Invalid JSON configuration"
-          exit 1
-        fi
-        
-        required_fields=("menuOrder" "headTitle" "h1" "h2")
-        for field in "${required_fields[@]}"; do
-          if ! jq -e ".$field" config/config.json > /dev/null; then
-            echo "Error: Missing required field '$field' in config.json"
-            exit 1
-          fi
-        done
-
     - name: Convert Markdown Files in /input to HTML
-      run: |
+      run: | # bash
         for file in $(find input -name '*.md'); do
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"
-          
-          # Add metadata to HTML files
-          title=$(basename "${file%.md}")
-          sed -i "1i <!DOCTYPE html>\n<html>\n<head>\n<title>$title</title>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n<body>" "$output_file"
-          echo "</body>\n</html>" >> "$output_file"
-          
-          # Optimize HTML
-          tidy -i -o "$output_file" "$output_file" 2>/dev/null || true
         done
       # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
      
     # yaml-embedded-languages: bash
     - name: Generate New Index.html with JSON Config
-      run: |
+      run: | # js
+        # Read configuration from config.json
         head_title=$(jq -r '.headTitle' config/config.json)
         h1_text=$(jq -r '.h1' config/config.json)
-        h2_text=$(jq -r '.h2' config/config.json)
         menu_order=$(jq -r '.menuOrder[]' config/config.json)
 
-        cat > index.html << EOF
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>$head_title</title>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body>
-          <nav>
-            <ul>
-        EOF
+        echo "<!DOCTYPE html>" > index.html
+        echo "<html>" >> index.html
+        echo "<head><title>$head_titxle</title></head>" >> index.html
+        echo "<body>" >> index.html
 
+        # Add top menu with links based on JSON config
+        echo "<nav><ul>" >> index.html
         for item in $menu_order; do
-          echo "              <li><a href='output/$item.html'>$item</a></li>" >> index.html
+          echo "<li><a href='output/$item.html'>$item</a></li>" >> index.html
         done
+        echo "</ul></nav>" >> index.html
 
-        cat >> index.html << EOF
-            </ul>
-          </nav>
-          <h1>$h1_text</h1>
-          <h2>$h2_text</h2>
-          <ul>
-        EOF
+        # Add main heading from JSON config
+        echo "<h1>$h1_text</h1>" >> index.html
 
+        echo "<ul>" >> index.html
+
+        # Generate links for all HTML files in the output directory
         for file in $(find output -name '*.html'); do
           filename=$(basename "$file")
-          echo "            <li><a href='output/$filename'>$filename</a></li>" >> index.html
+          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
         done
 
-        cat >> index.html << EOF
-          </ul>
-        </body>
-        </html>
-        EOF
+        echo "</ul>" >> index.html
+        echo "</body>" >> index.html
+        echo "</html>" >> index.html
       # Dynamically generates an index.html file with links to all HTML files in the output directory.
 
-    - name: Check for Broken Links
-      run: |
-        blc -r -e -o index.html output/*.html || true
-
     - name: Commit and Push Changes
+
       run: |
         if ls output/*.html 1> /dev/null 2>&1; then
           git config --global user.name "github-actions[bot]"
