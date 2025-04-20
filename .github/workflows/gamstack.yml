@@ -1,3 +1,4 @@
+# yaml-embedded-languages: shell
 name: Convert Markdown to HTML and Generate Index
 
 on:
@@ -25,29 +26,29 @@ jobs:
       # Sets up Node.js version 16, required for running JavaScript-based tools.
 
     - name: Install markdown-to-html converter and Pandoc
-      run: |  # js
+      run: |
         npm install -g markdown-it-cli
         sudo apt-get update
         sudo apt-get install -y pandoc
       # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
     - name: Clean Output Directory
-      run: | # 
+      run: |
         rm -rf output/*
         mkdir -p output
       # Cleans the 'output' directory to ensure it is rebuilt from scratch based on the 'input' folder structure.
 
     - name: Convert Markdown Files in /input to HTML
-      run: | # bash
+      run: |
         for file in $(find input -name '*.md'); do
           output_file="output/$(basename "${file%.md}.html")"
           markdown-it "$file" > "$output_file"
         done
       # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
      
-    # yaml-embedded-languages: bash
     - name: Generate New Index.html with JSON Config
-      run: | # html
+      run: | #
+      
         # Read configuration from config.json
         head_title=$(jq -r '.headTitle' config/config.json)
         h1_text=$(jq -r '.h1' config/config.json)
@@ -55,7 +56,7 @@ jobs:
 
         echo "<!DOCTYPE html>" > index.html
         echo "<html>" >> index.html
-        echo "<head><title>$head_titxle</title></head>" >> index.html
+        echo "<head><title>$headTitle</title></head>" >> index.html
         echo "<body>" >> index.html
 
         # Add top menu with links based on JSON config

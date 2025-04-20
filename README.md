@@ -3,7 +3,7 @@
 GAMstack is a simple tool that lets you build and publish a website using only Markdown files and GitHub. You write your content in Markdown, save it to your GitHub repository, and GitHub Actions will turn it into a website for you. Your site will be hosted for free with GitHub Pages, so anyone can see it online
 
 No coding skills needed. No complicated setup. Just write, push, and publish!
-
+S
 **📦 Core Stack**
 - 📝 A **GitHub Repository** with your **Markdown files**
 - ⚙️ **GitHub Actions** to build and publish your site
