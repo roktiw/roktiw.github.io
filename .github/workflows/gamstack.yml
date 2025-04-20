@@ -1,74 +1,71 @@
-# yaml-embedded-languages: shell
-name: Convert Markdown to HTML and Generate Index
+name: Build and Deploy to GitHub Pages
 
 on:
-  workflow_run:
-    workflows: ["Deploy static content to Pages"]
-    types:
-      - completed
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
-  gamstack-main:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      # Checks out the repository to the runner, allowing access to the codebase.
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '16'
-      # Sets up Node.js version 16, required for running JavaScript-based tools.
 
     - name: Install markdown-to-html converter and Pandoc
       run: |
         npm install -g markdown-it-cli
         sudo apt-get update
         sudo apt-get install -y pandoc
-      # Installs the markdown-it-cli tool for Markdown conversion and Pandoc for additional processing.
 
     - name: Clean Output Directory
       run: |
         rm -rf output/*
         mkdir -p output
-      # Cleans the 'output' directory to ensure it is rebuilt from scratch based on the 'input' folder structure.
 
     - name: Convert Markdown Files in /input to HTML
       run: |
         for file in $(find input -name '*.md'); do
-          output_file="output/$(basename "${file%.md}.html")"
+          output_file="output/$(basename \"${file%.md}.html\")"
           markdown-it "$file" > "$output_file"
         done
-      # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
-     
+
     - name: Generate Dynamic Menu
       run: |
         bash scripts/generate_menu.sh
-      # Generates a dynamic menu based on the structure of the `input/` folder.
-
-    - name: Generate Menu
-      run: |
-        bash scripts/generate_menu.sh
-      # Ensures the `menu.html` file is generated before combining templates.
 
     - name: Combine Templates into Index.html
       run: |
         cat templates/header.html templates/menu.html templates/footer.html > index.html
-      # Combines header, menu, and footer templates to create the `index.html` file.
 
-    - name: Commit and Push Changes
-      run: |
-        if ls output/*.html 1> /dev/null 2>&1; then
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html output/*.html
-          git commit -m "Convert Markdown to HTML and Generate Index [GitHub Actions]"
-          git push
-        else
-          echo "No HTML files to commit."
-        fi
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4

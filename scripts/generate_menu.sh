@@ -4,6 +4,9 @@
 INPUT_DIR="../input"
 OUTPUT_FILE="../templates/menu.html"
 
+# Ensure the output directory exists
+mkdir -p ../templates
+
 # Start the menu HTML
 echo "<ul>" > $OUTPUT_FILE
 
