@@ -1,3 +1,3 @@
-# First blok post. Yay!
+# 2025-04-20 blog post yay!
 
-Hello world! Hello gamstack
+Hello world! Hello gamstack!

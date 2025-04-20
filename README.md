@@ -13,7 +13,7 @@ S
 
 | ⛵ **Creators** | 💻 **Developers** |
 |----------------------------|----------------------------|
-| 🧠 **Lifehackers & tool-switchers** – jumping between Notion, Obsidian, Apple Notes, Ulysses but still searching for that perfect flow | 🤖 **AI vibe coders, indie devs & no-code hackers** – perfect for automating your project’s website or content site |
+| 🧠 **Lifehackers & tool-switchers** – jumping between Notion, Obsidian, Apple Notes, Ulysses but still searching for that perfect flow | 🤖 **AI vibe coders, indie devs & no-code hackers** – perfect for automating your project's website or content site |
 | ✍️ **Bloggers & writers** – focused on flow, not config | 🛠️ **Developers & DevOps** – need zero-maintenance, Git-powered release notes & documentation |
 | 📱 **Social media users** – want to go beyond FITstack (Facebook, Instagram, TikTok) and own a personal site like in the 90s | 🧠 **CTOs, PMs, TPOs** – clean and secure static sties for your product documentation 
 | 🔎 **Want to learn more?** [💡 Why Use GAMstack? - ⛵ For Creators](#-why-use-gamstack----for-creators) | 🔎 *Want to learn more?* [💡 Why Use GAMstack? - 💻 For Developers](#-why-use-gamstack----for-developers) |
@@ -61,13 +61,161 @@ A few principles we believe in — for both creators and developers:
 - 🗃️ **Versioned, trackable, transparent** — powered by Git.
 - 🕊️ **Minimal setup, maximal freedom.**
 
+**🏗️ Build Logic & Structure**
+
+Our build process follows these core principles:
+
+1. 🚀 **Build Process & GitHub Actions**
+   - Automated build triggered on every push
+   - Build steps:
+     ```yaml
+     steps:
+     1. Checkout repository
+     2. Copy input/ → output/     # Mirror directory structure
+     3. Process Markdown files    # Convert .md to .html
+     4. Generate section pages    # Create indexes
+     5. Build navigation         # From directory structure
+     6. Assemble final pages     # Combine with templates
+     7. Deploy to GitHub Pages   # Make site live
+     ```
+   - Error handling and notifications
+   - Build status in GitHub Actions tab
+
+2. 📁 **Directory Mirroring & File Processing**
+   - Input directory structure is exactly mirrored in output
+   - Everything from `/input/` is copied 1:1 to `/output/`
+   - All `.md` files are converted to `.html`
+   - Example structure:
+     ```
+     input/                     output/
+     ├── homepage.md       →    ├── index.html
+     ├── blog/            →     ├── blog/
+     │   ├── blog.md      →     │   ├── index.html
+     │   ├── post1.md     →     │   ├── post1.html
+     │   └── post2.md     →     │   └── post2.html
+     ├── projects/        →     ├── projects/
+     │   ├── projects.md  →     │   ├── index.html
+     │   └── proj1.md     →     │   └── proj1.html
+     └── about-me/        →     └── about-me/
+         └── about.md     →         └── index.html
+     ```
+
+3. 🎯 **Section Pages & Auto-indexing**
+   - Each folder can have its main content file
+   - Naming convention: `folder/folder.md` → `folder/index.html`
+   - Section pages automatically include:
+     ```markdown
+     # Blog                    <!-- From blog.md -->
+     
+     Welcome to my blog!       <!-- Main content from blog.md -->
+     
+     ## Latest Posts          <!-- Auto-generated section -->
+     - [Post 2](post2.html)   <!-- Links generated automatically -->
+     - [Post 1](post1.html)   <!-- In directory order -->
+     ```
+   - Files are listed in directory order by default
+   - Customizable via front matter:
+     ```yaml
+     ---
+     title: My Blog
+     layout: blog
+     sort: date-desc
+     exclude: ["draft-post.md"]
+     ---
+     ```
+
+4. 🏠 **Homepage & Template Assembly**
+   - Homepage built from modular components:
+     ```
+     templates/                    Final index.html
+     ├── header.html         →     <!DOCTYPE html>
+     │   └── meta, title          <html>
+     ├── menu.html          →     <nav>Menu items</nav>
+     │   └── auto-generated       <main>
+     ├── content.html       →       Homepage content
+     │   └── from homepage.md     </main>
+     └── footer.html        →     <footer>Site info</footer>
+                                 </html>
+     ```
+   - Clean, semantic HTML output
+   - Consistent layout across all pages
+   - SEO-friendly structure
+   - Automatic meta tags:
+     ```html
+     <meta name="description" content="...">
+     <meta name="keywords" content="...">
+     <meta property="og:title" content="...">
+     ```
+
+5. 📑 **Menu & Navigation**
+   - Automatic menu generation from directory structure
+   - Configurable via `config.json`:
+     ```json
+     {
+       "menu": {
+         "order": ["blog", "projects", "about-me"],
+         "titles": {
+           "blog": "My Blog",
+           "projects": "Portfolio",
+           "about-me": "About"
+         },
+         "hide": ["private", "drafts"],
+         "home": {
+           "title": "Home",
+           "show": true
+         }
+       },
+       "site": {
+         "title": "My GAMstack Site",
+         "description": "Personal website built with GAMstack",
+         "author": "Your Name",
+         "social": {
+           "twitter": "@username",
+           "github": "username"
+         }
+       },
+       "build": {
+         "exclude_patterns": ["*.draft.md", "README.md"],
+         "copy_files": ["CNAME", "robots.txt"],
+         "minify": true
+       }
+     }
+     ```
+   - Responsive navigation for mobile devices
+   - Active page highlighting
+   - Breadcrumb navigation (optional)
+
+6. 🎨 **Templates & Component System**
+   - Core templates in `/templates/`:
+     ```
+     templates/
+     ├── base/
+     │   ├── header.html      → Site header, meta tags
+     │   ├── footer.html      → Site footer
+     │   └── menu.html        → Navigation menu
+     ├── layouts/
+     │   ├── default.html     → Default page layout
+     │   ├── section.html     → Section page layout
+     │   └── post.html        → Individual post layout
+     ├── partials/
+     │   ├── analytics.html   → Optional analytics
+     │   └── social.html      → Social media links
+     └── styles/
+         ├── main.css        → Core styles
+         └── custom.css      → Your customizations
+     ```
+   - Consistent styling across all pages
+   - Easy to customize and extend
+   - Mobile-first responsive design
+   - Dark mode support (optional)
+
 ### 💡 Why Use GAMstack? - ⛵ For Creators
 
 - ✍️ Write your content in **Markdown**, like a normal doc or note.
 - 💡 No distractions – no logins, no popups, no notifications.
 - 🧘‍♀️ Zen flow – write once, publish instantly.
 - 🌐 Your content becomes a **real website** people can visit.
-- 🧳 Ideal if you’ve bounced between **Notion, Obsidian, Ulysses, Apple Notes**, etc.
+- 🧳 Ideal if you've bounced between **Notion, Obsidian, Ulysses, Apple Notes**, etc.
 
 ### 💡 Why Use GAMstack? - 💻 For Developers
 
@@ -93,7 +241,7 @@ GAMstack is the next step after these old stacks:
 - **MERN (MongoDB, Express.js, React, Node.js)** — because React turned your blog into a distributed system.
 - **MEVN (MongoDB, Express.js, Vue, Node.js)** — because Vue is cute but you still needed Node, Babel, and 19 plugins.
 - **PERN (PostgreSQL, Express.js, React, Node.js)** — because PostgreSQL is great, but now your front-end has 300 dependencies to render a button.
-- **Django Stack (Python, Django, PostgreSQL)** — because the ORM is magic... until it isn't, and therapy all start with “T.”
+- **Django Stack (Python, Django, PostgreSQL)** — because the ORM is magic... until it isn't, and therapy all start with "T."
 - **Firebase Stack (Firestore, Functions, Auth, Hosting)** — because Google wants your soul and your billing info.
 - **SST (Serverless Stack) (CDK, Lambda, API Gateway, DynamoDB)** — because debugging cold starts at 3AM builds character.
 - **AWS CDK Stack (AWS Cloud Development Kit + TypeScript)** — because writing TypeScript to generate YAML that generates JSON to deploy infra is totally sane.
