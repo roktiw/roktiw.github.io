@@ -19,15 +19,22 @@ find input -name "*.md" | while read file; do
     # Special handling for section index files
     if [ "$base_name" = "$(basename $(dirname "$file"))" ]; then
         output_file="$dir_path/index.html"
+        template="templates/default.html"
+        # Set section flag
+        metadata="--metadata=is_section:true"
     else
         output_file="$dir_path/$base_name.html"
+        template="templates/default.html"
+        metadata=""
     fi
     
     # Convert markdown to HTML
     pandoc "$file" \
         --standalone \
-        --template=templates/default.html \
+        --template="$template" \
         --metadata-file=config/site.json \
+        $metadata \
+        --include-in-header=templates/menu.html \
         -o "$output_file"
 done
 
@@ -35,7 +42,8 @@ done
 if [ -f "input/homepage.md" ]; then
     pandoc "input/homepage.md" \
         --standalone \
-        --template=templates/home.html \
+        --template="templates/home.html" \
         --metadata-file=config/site.json \
+        --include-in-header=templates/menu.html \
         -o "output/index.html"
 fi 

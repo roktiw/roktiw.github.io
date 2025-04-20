@@ -3,48 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>$if(title)$$title$$else$$site.title$$endif$ - $site.title$</title>
+    <title>$site.title$ - $site.description$</title>
     
-    <meta name="description" content="$if(description)$$description$$else$$site.description$$endif$">
+    <meta name="description" content="$site.description$">
     <meta name="author" content="$site.author$">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="$if(title)$$title$$else$$site.title$$endif$">
-    <meta property="og:description" content="$if(description)$$description$$else$$site.description$$endif$">
+    <meta property="og:title" content="$site.title$">
+    <meta property="og:description" content="$site.description$">
     
     <!-- Styles -->
     <link rel="stylesheet" href="/styles/main.css">
     <link rel="stylesheet" href="/styles/custom.css">
 </head>
 <body>
-    <header>
+    <header class="home-header">
         <div class="container">
-            <h1><a href="/">$site.title$</a></h1>
+            <h1>$site.title$</h1>
             ${ menu.html() }$
         </div>
     </header>
 
-    <main class="container">
-        $if(is_section)$
-        <article class="section-content">
-            $body$
-            
-            $if(section_files)$
-            <section class="section-listing">
-                <h2>Contents</h2>
-                <ul>
-                    $for(section_files)$
-                    <li><a href="$it.url$">$it.title$</a></li>
-                    $endfor$
-                </ul>
-            </section>
-            $endif$
-        </article>
-        $else$
-        <article class="post-content">
+    <main class="container home-content">
+        <article>
             $body$
         </article>
-        $endif$
     </main>
 
     <footer>
