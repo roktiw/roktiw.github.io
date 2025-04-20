@@ -51,7 +51,12 @@ jobs:
         bash scripts/generate_menu.sh
       # Generates a dynamic menu based on the structure of the `input/` folder.
 
-    - name: Generate Index.html
+    - name: Generate Menu
+      run: |
+        bash scripts/generate_menu.sh
+      # Ensures the `menu.html` file is generated before combining templates.
+
+    - name: Combine Templates into Index.html
       run: |
         cat templates/header.html templates/menu.html templates/footer.html > index.html
       # Combines header, menu, and footer templates to create the `index.html` file.
