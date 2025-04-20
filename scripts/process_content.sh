@@ -9,6 +9,9 @@ find input -type d | while read dir; do
     mkdir -p "output/${dir#input/}"
 done
 
+# Ensure menu is generated first
+./scripts/generate_menu.sh
+
 # Process Markdown files
 find input -name "*.md" | while read file; do
     # Get relative path and create output path
@@ -34,7 +37,8 @@ find input -name "*.md" | while read file; do
         --template="$template" \
         --metadata-file=config/site.json \
         $metadata \
-        --include-in-header=templates/menu.html \
+        --include-before-body=templates/menu.html \
+        --variable=year="$(date +%Y)" \
         -o "$output_file"
 done
 
@@ -44,6 +48,7 @@ if [ -f "input/homepage.md" ]; then
         --standalone \
         --template="templates/home.html" \
         --metadata-file=config/site.json \
-        --include-in-header=templates/menu.html \
+        --include-before-body=templates/menu.html \
+        --variable=year="$(date +%Y)" \
         -o "output/index.html"
 fi 

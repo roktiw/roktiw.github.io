@@ -20,7 +20,9 @@
     <header class="home-header">
         <div class="container">
             <h1>$site.title$</h1>
-            ${ menu.html() }$
+            $for(include-before)$
+            $include-before$
+            $endfor$
         </div>
     </header>
 
