@@ -2,10 +2,10 @@
 name: Convert Markdown to HTML and Generate Index
 
 on:
-  push:
-    paths:
-      - 'posts/*.md'
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy static content to Pages"]
+    types:
+      - completed
 
 permissions:
   contents: write

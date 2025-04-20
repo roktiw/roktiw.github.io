@@ -41,3 +41,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Trigger GAMstack Workflow
+        run: |
+          echo "Triggering GAMstack workflow..."
+          gh workflow run gamstack.yml
