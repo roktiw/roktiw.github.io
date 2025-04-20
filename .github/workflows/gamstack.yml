@@ -46,44 +46,17 @@ jobs:
         done
       # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
      
-    - name: Generate New Index.html with JSON Config
-      run: | #
-      
-        # Read configuration from config.json
-        head_title=$(jq -r '.headTitle' config/config.json)
-        h1_text=$(jq -r '.h1' config/config.json)
-        menu_order=$(jq -r '.menuOrder[]' config/config.json)
+    - name: Generate Dynamic Menu
+      run: |
+        bash scripts/generate_menu.sh
+      # Generates a dynamic menu based on the structure of the `input/` folder.
 
-        echo "<!DOCTYPE html>" > index.html
-        echo "<html>" >> index.html
-        echo "<head><title>$headTitle</title></head>" >> index.html
-        echo "<body>" >> index.html
-
-        # Add top menu with links based on JSON config
-        echo "<nav><ul>" >> index.html
-        for item in $menu_order; do
-          echo "<li><a href='output/$item.html'>$item</a></li>" >> index.html
-        done
-        echo "</ul></nav>" >> index.html
-
-        # Add main heading from JSON config
-        echo "<h1>$h1_text</h1>" >> index.html
-
-        echo "<ul>" >> index.html
-
-        # Generate links for all HTML files in the output directory
-        for file in $(find output -name '*.html'); do
-          filename=$(basename "$file")
-          echo "<li><a href='output/$filename'>$filename</a></li>" >> index.html
-        done
-
-        echo "</ul>" >> index.html
-        echo "</body>" >> index.html
-        echo "</html>" >> index.html
-      # Dynamically generates an index.html file with links to all HTML files in the output directory.
+    - name: Generate Index.html
+      run: |
+        cat templates/header.html templates/menu.html templates/footer.html > index.html
+      # Combines header, menu, and footer templates to create the `index.html` file.
 
     - name: Commit and Push Changes
-
       run: |
         if ls output/*.html 1> /dev/null 2>&1; then
           git config --global user.name "github-actions[bot]"
