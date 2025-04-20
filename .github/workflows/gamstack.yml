@@ -16,12 +16,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '16'
+        node-version: '20'
 
     - name: Install dependencies
       run: |
@@ -64,12 +64,14 @@ jobs:
           find output -name "*.html" -exec html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o {} {} \;
         fi
 
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+    - name: List output directory
+      run: |
+        ls -la output/
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        name: github-pages
         path: output
-        retention-days: 1
 
   deploy:
     needs: build
@@ -79,20 +81,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
-    - name: Download build artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: github-pages
-        path: output
-
-    - name: Setup Pages
-      uses: actions/configure-pages@v5
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: output
-
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
