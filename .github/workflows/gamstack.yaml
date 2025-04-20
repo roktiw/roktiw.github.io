@@ -1,0 +1,130 @@
+name: Convert Markdown to HTML and Generate Index
+
+on:
+  push:
+    paths:
+      - 'posts/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gamstack-main:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      # Checks out the repository to the runner, allowing access to the codebase.
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+      # Sets up Node.js version 16, required for running JavaScript-based tools.
+
+    - name: Install dependencies
+      run: |
+        npm install -g markdown-it-cli
+        sudo apt-get update
+        sudo apt-get install -y pandoc html-tidy
+        npm install -g broken-link-checker
+
+    - name: Clean Output Directory
+      run: |
+        rm -rf output/*
+        mkdir -p output
+      # Cleans the 'output' directory to ensure it is rebuilt from scratch based on the 'input' folder structure.
+
+    - name: Validate Configuration
+      run: |
+        if ! jq -e . config/config.json > /dev/null; then
+          echo "Error: Invalid JSON configuration"
+          exit 1
+        fi
+        
+        required_fields=("menuOrder" "headTitle" "h1" "h2")
+        for field in "${required_fields[@]}"; do
+          if ! jq -e ".$field" config/config.json > /dev/null; then
+            echo "Error: Missing required field '$field' in config.json"
+            exit 1
+          fi
+        done
+
+    - name: Convert Markdown Files in /input to HTML
+      run: |
+        for file in $(find input -name '*.md'); do
+          output_file="output/$(basename "${file%.md}.html")"
+          markdown-it "$file" > "$output_file"
+          
+          # Add metadata to HTML files
+          title=$(basename "${file%.md}")
+          sed -i "1i <!DOCTYPE html>\n<html>\n<head>\n<title>$title</title>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n</head>\n<body>" "$output_file"
+          echo "</body>\n</html>" >> "$output_file"
+          
+          # Optimize HTML
+          tidy -i -o "$output_file" "$output_file" 2>/dev/null || true
+        done
+      # Converts all Markdown files in the 'input' directory and its subdirectories to HTML and saves them in the 'output' folder.
+     
+    # yaml-embedded-languages: bash
+    - name: Generate New Index.html with JSON Config
+      run: |
+        head_title=$(jq -r '.headTitle' config/config.json)
+        h1_text=$(jq -r '.h1' config/config.json)
+        h2_text=$(jq -r '.h2' config/config.json)
+        menu_order=$(jq -r '.menuOrder[]' config/config.json)
+
+        cat > index.html << EOF
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>$head_title</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body>
+          <nav>
+            <ul>
+        EOF
+
+        for item in $menu_order; do
+          echo "              <li><a href='output/$item.html'>$item</a></li>" >> index.html
+        done
+
+        cat >> index.html << EOF
+            </ul>
+          </nav>
+          <h1>$h1_text</h1>
+          <h2>$h2_text</h2>
+          <ul>
+        EOF
+
+        for file in $(find output -name '*.html'); do
+          filename=$(basename "$file")
+          echo "            <li><a href='output/$filename'>$filename</a></li>" >> index.html
+        done
+
+        cat >> index.html << EOF
+          </ul>
+        </body>
+        </html>
+        EOF
+      # Dynamically generates an index.html file with links to all HTML files in the output directory.
+
+    - name: Check for Broken Links
+      run: |
+        blc -r -e -o index.html output/*.html || true
+
+    - name: Commit and Push Changes
+      run: |
+        if ls output/*.html 1> /dev/null 2>&1; then
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html output/*.html
+          git commit -m "Convert Markdown to HTML and Generate Index [GitHub Actions]"
+          git push
+        else
+          echo "No HTML files to commit."
+        fi
