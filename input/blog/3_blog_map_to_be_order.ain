@@ -1,0 +1,52 @@
+# 1.	Skanowanie folderu: Skrypt skanuje bieżący folder w poszukiwaniu plików .md.
+# 2.	Odczyt pliku YAML: Skrypt odczytuje plik 2_blog_order.yaml, w którym użytkownik ręcznie ustawia kolejność plików.
+# 3.	Traktowanie nazw plików jako stringi: Skrypt traktuje każdą nazwę pliku jako pojedynczy ciąg znaków, nawet jeśli zawiera spacje, aby uniknąć ich błędnego rozdzielenia przez Bash (np. na osobne pliki).
+# 4.	Dodanie prefiksu _blogXXX_: Skrypt przypisuje każdemu plikowi .md nowy prefiks _blogXXX_, gdzie XXX to numer kolejności pliku zgodny z kolejnością z pliku YAML. Wartość XXX to numer porządkowy, który będzie rosły w miarę dodawania kolejnych plików w pliku YAML.
+# 5.	Zachowanie kolejności w Finderze: Dzięki dodaniu prefiksu, pliki będą sortowane alfabetycznie w Finderze, co pozwoli zachować ręcznie ustawioną kolejność w pliku YAML w systemie plików.
+
+.aai to lik dla AI z instrukcjami promptem, etc.said
+
+a przed ai aby odrónić nazwe pliku od `.ai` uzywanych przez adobe
+
+
+# AIN (Artificial Intelligence Note) File Manifest
+
+The **AIN** file format serves as a structured container for notes, instructions, prompts, and tasks to be processed by Artificial Intelligence (AI). Below is the manifest that defines the purpose, structure, and guidelines for creating and using **AIN** files.
+
+## 1. Purpose
+The **AIN** file is designed to store notes, guidelines, instructions, and prompts that AI will use to generate code, solve problems, or accomplish tasks. It provides a clear and organized structure for interaction between human intentions and AI processing.
+
+## 2. Content
+Each **AIN** file should contain clearly defined tasks, algorithms, instructions, and input data that AI can process to generate the desired results. It serves as the primary reference for AI to understand what needs to be done.
+
+## 3. Structure
+The file should be structured in a readable and logical way, with distinct sections such as:
+- Task description
+- Implementation details
+- Expected outputs
+- Input/Output examples
+
+## 4. Format
+The **AIN** file can be in various formats such as plain text, JSON, YAML, or any other format suitable for storing structured data. The format should align with the task requirements and the AI tool being used.
+
+## 5. Clarity
+Instructions inside the **AIN** file must be clear and unambiguous. This ensures that AI can correctly interpret and perform the task according to the outlined expectations.
+
+## 6. Modularity
+Content in the **AIN** file should be modular, allowing individual tasks, algorithms, and data sets to be easily edited or extended without affecting the entire structure.
+
+## 7. Examples
+**AIN** files should include examples of input and output data to provide context and help AI understand the task better. This enhances the model's performance and ensures expected results.
+
+## 8. Flexibility
+The **AIN** file format can be used for a wide range of applications, from generating code to solving mathematical problems or creating content. It is flexible and can be tailored to specific needs.
+
+## 9. Collaboration
+The **AIN** file format facilitates collaboration between humans and AI, acting as a bridge that translates human intentions into algorithmic processing by AI. It allows both parties to communicate effectively.
+
+## 10. Compatibility
+**AIN** files should be compatible with popular AI tools like GitHub Copilot, OpenAI, and custom AI models, enabling easy integration and use across various platforms and environments.
+
+---
+
+This **AIN** file manifest serves as a guide for creating well-structured, effective notes and instructions that AI can process, enhancing productivity and collaboration in projects.

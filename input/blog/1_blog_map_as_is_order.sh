@@ -2,7 +2,7 @@
 
 # Używamy bieżącego folderu roboczego
 folder="."
-output_file="2-blog-order.yaml"
+output_file="2_blog_order.yaml"
 
 # Usuwamy istniejący plik output, jeśli już istnieje
 if [ -f "$output_file" ]; then
