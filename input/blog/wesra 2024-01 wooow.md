@@ -1,3 +1,7 @@
+
+# new entry
+
+
 input/                 output/
 ├── homepage.md   →    ├── index.html (assembled from parts)
 ├── blog/        →     ├── blog/
