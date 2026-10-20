@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="description" content="Captain's Diary — a minimal, local-first Markdown workspace. Write across folders, see saved diffs, and navigate your project's knowledge graph.">
+  <title>Captain's Diary — Local-first Markdown workspace</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b0d10;--panel:#14171d;--panel2:#101318;--ink:#eeeae3;--muted:#a2a5ac;--edge:#30333a;--accent:#d9bc8c;--focus:#f5d3a1}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif}
+    a{color:var(--accent);text-underline-offset:3px}a:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:4px}
+    .wrap{width:min(1060px,calc(100% - 40px));margin:auto}
+    header{border-bottom:1px solid var(--edge);position:relative}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:19px 0}
+    .brand{color:var(--ink);font-size:15px;font-weight:740;letter-spacing:-.02em;text-decoration:none}
+    .brand span{color:var(--accent)}.nav nav{display:flex;gap:22px}.nav nav a{font-size:13px;color:var(--muted);text-decoration:none}
+    .nav nav a:hover{color:var(--ink)}
+    .hero{padding:86px 0 54px;max-width:780px}
+    .eyebrow{font:600 11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 21px}
+    h1{font-size:clamp(44px,6.9vw,82px);line-height:1.02;letter-spacing:-.065em;font-weight:700;margin:0 0 28px}
+    .lead{max-width:650px;font-size:clamp(17px,2vw,20px);color:#b9bbc0;margin:0 0 25px}
+    .stamp{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid var(--edge);border-radius:100px;color:var(--muted);font-size:12px}
+    .dot{width:7px;height:7px;background:#9eac93;border-radius:50%}
+    .section{padding:51px 0;border-top:1px solid var(--edge)}
+    h2{font-size:clamp(24px,3vw,32px);line-height:1.17;letter-spacing:-.035em;margin:0 0 12px}
+    .sub{color:var(--muted);max-width:710px;margin:0 0 26px}
+    .features,.downloads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .tile{border:1px solid var(--edge);border-radius:13px;padding:23px;background:var(--panel)}
+    .tile .count{color:var(--accent);font:500 12px ui-monospace,SFMono-Regular,monospace}
+    .tile h3{font-size:17px;margin:19px 0 10px;letter-spacing:-.02em}
+    .tile p{font-size:14px;color:var(--muted);margin:0}
+    .platform{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .platform h3{margin:0}.platform small{font-size:11px;color:var(--muted)}
+    .pill{border:1px solid #464039;color:var(--accent);border-radius:12px;padding:2px 8px;font-size:11px;white-space:nowrap}
+    .pill.off{color:#999ca4;border-color:var(--edge)}
+    .details{margin:12px 0 20px!important;min-height:60px}
+    .action{display:inline-flex;justify-content:center;align-items:center;width:100%;padding:12px 15px;background:var(--accent);border:1px solid var(--accent);border-radius:7px;color:#17110b;font-size:13px;font-weight:750;text-decoration:none;min-height:45px}
+    .action:hover{background:#f0d2a5}.action.secondary{background:transparent;color:var(--ink);border-color:#565960}
+    .action.secondary:hover{border-color:var(--accent)}
+    .action.disabled{background:#1a1c21;border-color:var(--edge);color:#85868d;cursor:not-allowed}
+    .meta{font-size:12px;color:var(--muted);margin-top:12px}
+    .note{margin-top:24px;padding:15px 18px;border:1px solid var(--edge);background:var(--panel2);border-radius:8px;color:var(--muted);font-size:13px}
+    .walkthrough{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+    .walkthrough ol{padding-left:23px;color:var(--muted);font-size:15px;margin:0}.walkthrough li{padding-left:7px;margin:0 0 12px}
+    .tree{border:1px solid var(--edge);background:var(--panel);border-radius:12px;padding:24px;white-space:pre;overflow:auto;color:#dbd3c5;font:12px/1.85 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    footer{padding:33px 0 48px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;color:#85878e;font-size:12px}
+    footer a{color:#a2a5ac}
+    @media(max-width:800px){.features,.downloads{grid-template-columns:1fr}.walkthrough{grid-template-columns:1fr;gap:20px}.hero{padding:58px 0 42px}.nav nav{gap:12px}.tile{padding:20px}.details{min-height:unset}.section{padding:36px 0}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <header><div class="wrap nav"><a class="brand" href="./">C<span>·</span> Captain's Diary</a>
+    <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#download">Download</a><a href="#tour">Demo project</a></nav>
+  </div></header>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Local first / Markdown native / Desktop</p>
+      <h1>Write the whole project.<br>Not just one file.</h1>
+      <p class="lead">A quiet Markdown workspace for the structure behind your ideas. Navigate folders, edit continuous documents, inspect saved changes, and follow connections — without surrendering control of your files.</p>
+      <span class="stamp"><span class="dot" aria-hidden="true"></span> Early alpha · Electron desktop · Optional AI</span>
+    </section>
+    <section class="section" id="features" aria-labelledby="features-h">
+      <h2 id="features-h">Less noise. More context.</h2>
+      <p class="sub">Built around the editor's essential workflow. No cloud account is required for local Markdown editing.</p>
+      <div class="features">
+        <article class="tile"><div class="count">01 / NAVIGATION</div><h3>Folder as manuscript</h3><p>Browse files and headings. Open an entire nested folder as one contextual Markdown view while keeping original files separate.</p></article>
+        <article class="tile"><div class="count">02 / EDITOR</div><h3>Explicit Save and Diff</h3><p>Edit in Monaco, preview Markdown, save intentionally, and inspect saved changes via Timeline and Diff.</p></article>
+        <article class="tile"><div class="count">03 / CONTEXT</div><h3>Knowledge Graph</h3><p>See folder, file and heading relationships as an interactive graph. Click nodes to return to the editor.</p></article>
+      </div>
+    </section>
+    <section class="section" id="download" aria-labelledby="download-h">
+      <p class="eyebrow">Desktop alpha</p>
+      <h2 id="download-h">Choose your operating system.</h2>
+      <p class="sub" id="release-status" role="status" aria-live="polite">Checking for public release assets…</p>
+      <div class="downloads">
+        <article class="tile">
+          <div class="platform"><h3>macOS</h3><span class="pill" id="mac-badge">Tested</span></div>
+          <p class="details">Apple Silicon M1–M4 · ARM64<br>Portable ZIP containing the desktop app.</p>
+          <a class="action" id="mac-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/CaptainsDiary-macOS-arm64.zip?job=download%3Aapps" rel="noopener noreferrer">Download for Mac ↗</a>
+          <p class="meta" id="mac-meta">GitLab access required until public release is mirrored.</p>
+        </article>
+        <article class="tile">
+          <div class="platform"><h3>Linux</h3><span class="pill" id="linux-badge">Tested</span></div>
+          <p class="details">Linux x86-64 · Ubuntu compatible<br>Portable ZIP containing the desktop app.</p>
+          <a class="action" id="linux-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/CaptainsDiary-Linux-x64.zip?job=download%3Aapps" rel="noopener noreferrer">Download for Linux ↗</a>
+          <p class="meta" id="linux-meta">GitLab access required until public release is mirrored.</p>
+        </article>
+        <article class="tile">
+          <div class="platform"><h3>Windows</h3><span class="pill off">Not released</span></div>
+          <p class="details">Windows x64<br>Cross-build tooling exists, but no native launch verification for this alpha.</p>
+          <span class="action disabled" aria-disabled="true">Not available yet</span>
+          <p class="meta">Never represented as tested before native validation.</p>
+        </article>
+      </div>
+      <div class="note">
+        <strong>Before installing:</strong> these are early development builds. macOS alpha is ad-hoc signed, not Apple-notarized; Gatekeeper may warn. Linux requires standard desktop libraries. Use a disposable Markdown folder and back up important work. Always obtain <a id="checksum-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/SHA256SUMS?job=download%3Aapps" rel="noopener noreferrer">SHA256SUMS</a> from the same release as the ZIP. A checksum verifies integrity, not publisher identity. <a href="https://gitlab.com/roktiw/captains-diary/-/pipelines" rel="noopener noreferrer">GitLab CI history ↗</a>
+      </div>
+    </section>
+    <section class="section" id="tour" aria-labelledby="tour-h">
+      <p class="eyebrow">Built-in onboarding</p>
+      <h2 id="tour-h">The demo is your manual.</h2>
+      <p class="sub">The app comes with a writable example Markdown project. One root, three chapters and three nested rooms per chapter. Read the docs in the very editor they explain.</p>
+      <div class="walkthrough">
+        <div>
+          <ol>
+            <li><strong>Explore.</strong> Navigate the tree, view a folder as one document, then open the Knowledge Graph.</li>
+            <li><strong>Write.</strong> Edit the tutorial sandbox, save a sentence, inspect the Timeline event and Diff.</li>
+            <li><strong>Deliver.</strong> Learn the local-first workflow, open your own project and understand alpha limitations.</li>
+          </ol>
+          <p><a href="https://gitlab.com/roktiw/captains-diary/-/blob/main/demo/captains-diary-tour/README.md" rel="noopener noreferrer">Read the tour's Markdown source ↗</a> <small style="color:var(--muted)">(private repository)</small></p>
+        </div>
+        <div class="tree" role="img" aria-label="Demo project with three top-level folders, each with three nested folders">captains-diary-tour/
+├── README.md
+├── 01-Explore/
+│   ├── 01-Navigation/
+│   ├── 02-Context/
+│   └── 03-Graph/
+├── 02-Write/
+│   ├── 01-Editor/
+│   ├── 02-Save-Diff/
+│   └── 03-Recovery/
+└── 03-Deliver/
+    ├── 01-Projects/
+    ├── 02-Workflow/
+    └── 03-Next-Steps/</div>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap"><span>Captain's Diary · Markdown stays yours.</span><span><a href="https://github.com/roktiw/roktiw.github.io/releases" rel="noopener noreferrer">Public releases</a> · <a href="https://gitlab.com/roktiw/captains-diary" rel="noopener noreferrer">GitLab source (private)</a></span></footer>
+  <script>
+    'use strict';
+    (async () => {
+      const status=document.getElementById('release-status');
+      const owner='roktiw/roktiw.github.io';
+      const expected={
+        'mac-link':'CaptainsDiary-macOS-arm64.zip',
+        'linux-link':'CaptainsDiary-Linux-x64.zip',
+        'checksum-link':'SHA256SUMS'
+      };
+      try {
+        const response=await fetch('https://api.github.com/repos/'+owner+'/releases?per_page=30',
+          {headers:{Accept:'application/vnd.github+json'}});
+        if(!response.ok) throw new Error('Public releases API unavailable');
+        const releases=await response.json();
+        const release=releases.find(item=>item.tag_name?.startsWith('diary-v') &&
+          !item.draft && Object.values(expected).every(name=>item.assets?.some(a=>a.name===name && a.state==='uploaded')));
+        if(!release) {
+          status.textContent='Public GitHub release not yet available. Existing tested preview downloads require access to the private GitLab project.';
+          return;
+        }
+        for(const [elementId,assetName] of Object.entries(expected)){
+          const asset=release.assets.find(a=>a.name===assetName);
+          const anchor=document.getElementById(elementId);
+          anchor.href=asset.browser_download_url;
+        }
+        document.getElementById('mac-meta').textContent='Public GitHub pre-release · tested native macOS GUI.';
+        document.getElementById('linux-meta').textContent='Public GitHub pre-release · tested native Linux GUI.';
+        status.textContent='Public download ready · '+release.name+'. Both packages passed native desktop CI. Windows remains unpublished.';
+      } catch {
+        status.textContent='Could not check public release status. The fallback download links require GitLab project access.';
+      }
+    })();
+  </script>
+</body>
+</html>
