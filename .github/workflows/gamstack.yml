@@ -64,6 +64,15 @@ jobs:
           find output -name "*.html" -exec html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o {} {} \;
         fi
 
+    # Copy after the older site's HTML/JS minification: the new standalone
+    # page uses modern JavaScript for GitHub Releases discovery.
+    - name: Copy Captain's Diary landing into Pages artifact
+      run: |
+        test -s captains-diary/index.html
+        mkdir -p output/captains-diary
+        cp captains-diary/index.html output/captains-diary/index.html
+        test -s output/captains-diary/index.html
+
     - name: List output directory
       run: |
         ls -la output/
