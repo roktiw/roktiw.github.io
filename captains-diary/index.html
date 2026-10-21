@@ -38,7 +38,9 @@
     .action{display:inline-flex;justify-content:center;align-items:center;width:100%;padding:12px 15px;background:var(--accent);border:1px solid var(--accent);border-radius:7px;color:#17110b;font-size:13px;font-weight:750;text-decoration:none;min-height:45px}
     .action:hover{background:#f0d2a5}.action.secondary{background:transparent;color:var(--ink);border-color:#565960}
     .action.secondary:hover{border-color:var(--accent)}
-    .action.disabled{background:#1a1c21;border-color:var(--edge);color:#85868d;cursor:not-allowed}
+    .action.disabled{background:#1a1c21;border-color:var(--edge);color:#85868d;cursor:not-allowed;pointer-events:none}
+    .release-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.release-meta div{border:1px solid var(--edge);border-radius:8px;padding:15px}.release-meta dt{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.release-meta dd{margin:7px 0 0;font-size:13px;overflow-wrap:anywhere}.release-links{display:flex;gap:16px;flex-wrap:wrap;margin-top:20px;font-size:13px}
+    @media(max-width:800px){.release-meta{grid-template-columns:1fr}}
     .meta{font-size:12px;color:var(--muted);margin-top:12px}
     .note{margin-top:24px;padding:15px 18px;border:1px solid var(--edge);background:var(--panel2);border-radius:8px;color:var(--muted);font-size:13px}
     .walkthrough{display:grid;grid-template-columns:1fr 1fr;gap:48px}
@@ -52,7 +54,7 @@
 </head>
 <body>
   <header><div class="wrap nav"><a class="brand" href="./">C<span>·</span> Captain's Diary</a>
-    <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#download">Download</a><a href="#tour">Demo project</a></nav>
+    <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#download">Download</a><a href="#release-info">Release notes</a><a href="#tour">Demo project</a></nav>
   </div></header>
   <main class="wrap">
     <section class="hero">
@@ -73,19 +75,19 @@
     <section class="section" id="download" aria-labelledby="download-h">
       <p class="eyebrow">Desktop alpha</p>
       <h2 id="download-h">Choose your operating system.</h2>
-      <p class="sub" id="release-status" role="status" aria-live="polite">Checking for public release assets…</p>
+      <p class="sub" id="release-status" role="status" aria-live="polite">Checking published public downloads…</p>
       <div class="downloads">
         <article class="tile">
           <div class="platform"><h3>macOS</h3><span class="pill" id="mac-badge">Tested</span></div>
           <p class="details">Apple Silicon M1–M4 · ARM64<br>Portable ZIP containing the desktop app.</p>
-          <a class="action" id="mac-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/CaptainsDiary-macOS-arm64.zip?job=download%3Aapps" rel="noopener noreferrer">Download for Mac ↗</a>
-          <p class="meta" id="mac-meta">GitLab access required until public release is mirrored.</p>
+          <a class="action disabled" id="mac-link" aria-disabled="true" tabindex="-1" rel="noopener noreferrer">Public download pending</a>
+          <p class="meta" id="mac-meta">Public asset upload pending. The private GitLab CI build is not a public download.</p>
         </article>
         <article class="tile">
           <div class="platform"><h3>Linux</h3><span class="pill" id="linux-badge">Tested</span></div>
           <p class="details">Linux x86-64 · Ubuntu compatible<br>Portable ZIP containing the desktop app.</p>
-          <a class="action" id="linux-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/CaptainsDiary-Linux-x64.zip?job=download%3Aapps" rel="noopener noreferrer">Download for Linux ↗</a>
-          <p class="meta" id="linux-meta">GitLab access required until public release is mirrored.</p>
+          <a class="action disabled" id="linux-link" aria-disabled="true" tabindex="-1" rel="noopener noreferrer">Public download pending</a>
+          <p class="meta" id="linux-meta">Public asset upload pending. The private GitLab CI build is not a public download.</p>
         </article>
         <article class="tile">
           <div class="platform"><h3>Windows</h3><span class="pill off">Not released</span></div>
@@ -95,8 +97,25 @@
         </article>
       </div>
       <div class="note">
-        <strong>Before installing:</strong> these are early development builds. macOS alpha is ad-hoc signed, not Apple-notarized; Gatekeeper may warn. Linux requires standard desktop libraries. Use a disposable Markdown folder and back up important work. Always obtain <a id="checksum-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/SHA256SUMS?job=download%3Aapps" rel="noopener noreferrer">SHA256SUMS</a> from the same release as the ZIP. A checksum verifies integrity, not publisher identity. <a href="https://gitlab.com/roktiw/captains-diary/-/pipelines" rel="noopener noreferrer">GitLab CI history ↗</a>
+        <strong>Before installing:</strong> these are early development builds. macOS alpha is ad-hoc signed, not Apple-notarized; Gatekeeper may warn. Linux requires standard desktop libraries. Use a disposable Markdown folder and back up important work. Always obtain <a id="checksum-link" aria-disabled="true" rel="noopener noreferrer">SHA256SUMS (pending)</a> from the same release as the ZIP. A checksum verifies integrity, not publisher identity. <a href="https://gitlab.com/roktiw/captains-diary/-/pipelines" rel="noopener noreferrer">GitLab CI history ↗</a>
       </div>
+    </section>
+    <section class="section" id="release-info" aria-labelledby="release-info-h">
+      <p class="eyebrow">Public release · provenance</p>
+      <h2 id="release-info-h">A build you can verify.</h2>
+      <p class="sub">The downloadable macOS and Linux ZIPs come from the same GitLab pipeline after native packaged-Electron tests. A public GitHub pre-release is only announced when both archives, checksums and the install guide are uploaded.</p>
+      <dl class="release-meta">
+        <div><dt>Release</dt><dd id="release-version">Awaiting public release</dd></div>
+        <div><dt>Source build</dt><dd id="release-build">Not published</dd></div>
+        <div><dt>Published</dt><dd id="release-date">Not published</dd></div>
+      </dl>
+      <div class="release-links">
+        <a id="release-notes" href="https://github.com/roktiw/roktiw.github.io/releases" rel="noopener noreferrer">Public release history ↗</a>
+        <a id="installer-link" aria-disabled="true" rel="noopener noreferrer">macOS installer script (pending)</a>
+        <a id="manifest-link" aria-disabled="true" rel="noopener noreferrer">Build manifest (pending)</a>
+        <a href="https://github.com/roktiw/roktiw.github.io/issues" rel="noopener noreferrer">Report a problem ↗</a>
+      </div>
+      <p class="note">Alpha safety: the macOS package is ad-hoc signed but not notarized. Check the exact ZIP against SHA256SUMS, review the installer script, and try the bundled demo on disposable files. SHA-256 alone does not authenticate the publisher. No Windows build is advertised as tested.</p>
     </section>
     <section class="section" id="install" aria-labelledby="install-h">
       <p class="eyebrow">Get started</p>
@@ -154,34 +173,56 @@
   <script>
     'use strict';
     (async () => {
-      const status=document.getElementById('release-status');
-      const owner='roktiw/roktiw.github.io';
-      const expected={
+      const status = document.getElementById('release-status');
+      const owner = 'roktiw/roktiw.github.io';
+      const assets = {
         'mac-link':'CaptainsDiary-macOS-arm64.zip',
         'linux-link':'CaptainsDiary-Linux-x64.zip',
-        'checksum-link':'SHA256SUMS'
+        'checksum-link':'SHA256SUMS',
+        'installer-link':'install-macos-alpha.sh',
+        'manifest-link':'manifest.json'
+      };
+      const enableLink = (id, url, label) => {
+        const a = document.getElementById(id);
+        a.href = url;
+        a.textContent = label;
+        a.classList.remove('disabled');
+        a.removeAttribute('aria-disabled');
+        a.removeAttribute('tabindex');
       };
       try {
-        const response=await fetch('https://api.github.com/repos/'+owner+'/releases?per_page=30',
+        const response = await fetch('https://api.github.com/repos/'+owner+'/releases?per_page=30',
           {headers:{Accept:'application/vnd.github+json'}});
-        if(!response.ok) throw new Error('Public releases API unavailable');
-        const releases=await response.json();
-        const release=releases.find(item=>item.tag_name?.startsWith('diary-v') &&
-          !item.draft && Object.values(expected).every(name=>item.assets?.some(a=>a.name===name && a.state==='uploaded')));
-        if(!release) {
-          status.textContent='Public GitHub release not yet available. Existing tested preview downloads require access to the private GitLab project.';
+        if (!response.ok) throw new Error('Public release metadata unavailable');
+        const releases = await response.json();
+        if (!Array.isArray(releases)) throw new Error('Unexpected response');
+        const release = releases.find(item =>
+          item.tag_name?.startsWith('diary-v') && !item.draft &&
+          Object.values(assets).every(name => item.assets?.some(a =>
+            a.name === name && a.state === 'uploaded' &&
+            (name.endsWith('.zip') ? a.size > 1024*1024 : a.size > 0))));
+        if (!release) {
+          status.textContent = 'Public downloads are being prepared. No verified public alpha assets have been published yet.';
           return;
         }
-        for(const [elementId,assetName] of Object.entries(expected)){
-          const asset=release.assets.find(a=>a.name===assetName);
-          const anchor=document.getElementById(elementId);
-          anchor.href=asset.browser_download_url;
-        }
-        document.getElementById('mac-meta').textContent='Public GitHub pre-release · tested native macOS GUI.';
-        document.getElementById('linux-meta').textContent='Public GitHub pre-release · tested native Linux GUI.';
-        status.textContent='Public download ready · '+release.name+'. Both packages passed native desktop CI. Windows remains unpublished.';
+        const lookup = name => release.assets.find(a => a.name === name).browser_download_url;
+        enableLink('mac-link', lookup(assets['mac-link']), 'Download macOS ARM64 ↗');
+        enableLink('linux-link', lookup(assets['linux-link']), 'Download Linux x64 ↗');
+        enableLink('checksum-link', lookup(assets['checksum-link']), 'SHA256SUMS ↗');
+        enableLink('installer-link', lookup(assets['installer-link']), 'macOS install script ↗');
+        enableLink('manifest-link', lookup(assets['manifest-link']), 'Build manifest ↗');
+        document.getElementById('mac-meta').textContent = 'Public ZIP · packaged native macOS CI test.';
+        document.getElementById('linux-meta').textContent = 'Public ZIP · packaged native Linux CI test.';
+        document.getElementById('release-version').textContent = release.name || release.tag_name;
+        document.getElementById('release-build').textContent = release.tag_name;
+        document.getElementById('release-date').textContent = release.published_at ?
+          new Date(release.published_at).toLocaleDateString(undefined, {year:'numeric',month:'long',day:'numeric'}) :
+          'Published';
+        enableLink('release-notes', release.html_url, 'Read this release’s notes ↗');
+        status.textContent = 'Public pre-release available · '+release.tag_name+
+          '. Both ZIPs are published with matching checksums; Windows is not released.';
       } catch {
-        status.textContent='Could not check public release status. The fallback download links require GitLab project access.';
+        status.textContent = 'Could not verify public release assets. Downloads remain disabled until verification succeeds.';
       }
     })();
   </script>
