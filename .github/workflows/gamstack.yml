@@ -1,86 +1,67 @@
-name: GAMstack Build & Deploy
+name: Public Pages — Captain's Diary
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout public site
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Assemble static Pages artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site/captains-diary
+          # Keep existing static GAMstack root/committed output. The legacy
+          # generator is independent of the Captain's Diary release page.
+          if [ -d output ]; then cp -R output/. _site/; fi
+          cp index.html _site/index.html
+          cp CNAME _site/CNAME
+          cp captains-diary/index.html _site/captains-diary/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          p = Path('_site/captains-diary/index.html')
+          html = p.read_text(encoding='utf-8')
+          class Check(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = set()
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  if 'id' in data:
+                      assert data['id'] not in self.ids, 'Duplicate ID: ' + data['id']
+                      self.ids.add(data['id'])
+          check = Check()
+          check.feed(html)
+          for name in ('mac-link','linux-link','checksum-link','release-status','release-info'):
+              assert name in check.ids, 'Missing download component: ' + name
+          assert 'api.github.com/repos/' in html, 'Missing release API lookup'
+          assert 'id="mac-link" aria-disabled="true"' in html, 'Mac download must start disabled'
+          assert 'id="linux-link" aria-disabled="true"' in html, 'Linux download must start disabled'
+          assert 'CaptainsDiary-Windows' not in html, 'No Windows download before native E2E'
+          assert Path('_site/CNAME').read_text().strip() == 'farmar.io'
+          print('PASS: static landing, public release discovery, safe pending state')
+          PY
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y pandoc jq
-        npm install -g markdown-it-cli
-
-    - name: Clean output directory
-      run: |
-        rm -rf output/*
-        mkdir -p output
-
-    - name: Make scripts executable
-      run: |
-        chmod +x scripts/*.sh
-
-    - name: Process content
-      run: |
-        ./scripts/process_content.sh
-
-    - name: Generate menu
-      run: |
-        ./scripts/generate_menu.sh
-
-    - name: Copy static files
-      run: |
-        # Copy files specified in config
-        jq -r '.build.copy_files[]' config/site.json | while read file; do
-          cp "$file" output/ 2>/dev/null || true
-        done
-        
-        # Copy styles
-        mkdir -p output/styles
-        cp templates/styles/* output/styles/ 2>/dev/null || true
-
-    - name: Minify if configured
-      run: |
-        if [ "$(jq -r '.build.minify' config/site.json)" = "true" ]; then
-          npm install -g html-minifier
-          find output -name "*.html" -exec html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o {} {} \;
-        fi
-
-    # Copy after the older site's HTML/JS minification: the new standalone
-    # page uses modern JavaScript for GitHub Releases discovery.
-    - name: Copy Captain's Diary landing into Pages artifact
-      run: |
-        test -s captains-diary/index.html
-        mkdir -p output/captains-diary
-        cp captains-diary/index.html output/captains-diary/index.html
-        test -s output/captains-diary/index.html
-
-    - name: List output directory
-      run: |
-        ls -la output/
-
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: output
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
 
   deploy:
     needs: build
@@ -88,8 +69,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy static Pages site
+        id: deployment
+        uses: actions/deploy-pages@v4
