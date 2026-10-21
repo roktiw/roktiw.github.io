@@ -98,6 +98,28 @@
         <strong>Before installing:</strong> these are early development builds. macOS alpha is ad-hoc signed, not Apple-notarized; Gatekeeper may warn. Linux requires standard desktop libraries. Use a disposable Markdown folder and back up important work. Always obtain <a id="checksum-link" href="https://gitlab.com/roktiw/captains-diary/-/jobs/artifacts/main/raw/bin/SHA256SUMS?job=download%3Aapps" rel="noopener noreferrer">SHA256SUMS</a> from the same release as the ZIP. A checksum verifies integrity, not publisher identity. <a href="https://gitlab.com/roktiw/captains-diary/-/pipelines" rel="noopener noreferrer">GitLab CI history ↗</a>
       </div>
     </section>
+    <section class="section" id="install" aria-labelledby="install-h">
+      <p class="eyebrow">Get started</p>
+      <h2 id="install-h">First run, without guesswork.</h2>
+      <p class="sub">The package includes a writable guided project. You can start learning before you open your own files.</p>
+      <div class="features">
+        <article class="tile"><div class="count">MACOS / ARM64</div><h3>Install a verified alpha</h3>
+          <p>Download the macOS ZIP, <code>SHA256SUMS</code> and <code>install-macos-alpha.sh</code> from the same release. Check the script before running it, then use:</p>
+          <pre style="overflow:auto;white-space:pre-wrap;color:var(--ink);font-size:12px">bash install-macos-alpha.sh &#92;
+  CaptainsDiary-macOS-arm64.zip &#92;
+  SHA256SUMS --allow-adhoc</pre>
+          <p>This is a deliberate opt-in to an unnotarized developer preview. It verifies the checksum and app signature, and installs in your user Applications directory.</p>
+        </article>
+        <article class="tile"><div class="count">LINUX / X64</div><h3>Extract and launch</h3>
+          <p>Download the Linux ZIP and <code>SHA256SUMS</code> from the same build. Verify the archive with <code>sha256sum -c SHA256SUMS</code>, extract it and launch <code>CaptainsDiaryElectron</code> from the extracted application folder.</p>
+          <p>Standard desktop system libraries are required; this is a portable ZIP, not an AppImage or distro package.</p>
+        </article>
+        <article class="tile"><div class="count">FIRST PROJECT</div><h3>Explore before editing</h3>
+          <p>On first launch, the app opens <code>captains-diary-tour</code>. Follow Explore → Write → Deliver. Make a change in its sandbox Markdown, press Save, then inspect Timeline and Diff.</p>
+          <p>Your own files are only accessible after you explicitly choose their folder. Back up anything important before alpha testing.</p>
+        </article>
+      </div>
+    </section>
     <section class="section" id="tour" aria-labelledby="tour-h">
       <p class="eyebrow">Built-in onboarding</p>
       <h2 id="tour-h">The demo is your manual.</h2>
